@@ -18,7 +18,7 @@ from datetime import datetime, timedelta, timezone
 from tkinter import Tk, ttk, StringVar, DoubleVar, IntVar
 from typing import Any, Union, Tuple, TypedDict, NoReturn, Generic, TYPE_CHECKING
 
-import pystray
+#import pystray
 from yarl import URL
 from PIL.ImageTk import PhotoImage
 from PIL import Image as Image_module
@@ -1076,7 +1076,7 @@ class TrayIcon:
 
     def __init__(self, manager: GUIManager, master: ttk.Widget):
         self._manager = manager
-        self.icon: pystray.Icon | None = None  # type: ignore[unused-ignore]
+        self.icon: None  # type: ignore[unused-ignore]
         self._icon_images: dict[str, Image_module.Image] = {
             "pickaxe": Image_module.open(resource_path("icons/pickaxe.ico")),
             "active": Image_module.open(resource_path("icons/active.ico")),
@@ -1132,14 +1132,14 @@ class TrayIcon:
         def bridge(func):
             return lambda: loop.call_soon_threadsafe(func)
 
-        menu = pystray.Menu(
-            pystray.MenuItem(_("gui", "tray", "show"), bridge(self.restore), default=True),
-            pystray.Menu.SEPARATOR,
-            pystray.MenuItem(_("gui", "tray", "quit"), bridge(self.quit)),
-        )
-        self.icon = pystray.Icon(
-            "twitch_miner", self._icon_images[self._icon_state], self.get_title(drop), menu
-        )
+        #menu = pystray.Menu(
+        #    pystray.MenuItem(_("gui", "tray", "show"), bridge(self.restore), default=True),
+        #    pystray.Menu.SEPARATOR,
+        #    pystray.MenuItem(_("gui", "tray", "quit"), bridge(self.quit)),
+        #)
+        #self.icon = pystray.Icon(
+        #    "twitch_miner", self._icon_images[self._icon_state], self.get_title(drop), menu
+        #)
         # self.icon.run_detached()
         loop.run_in_executor(None, self.icon.run)
 

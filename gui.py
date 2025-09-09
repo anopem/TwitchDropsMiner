@@ -1073,7 +1073,7 @@ class TrayIcon:
 
     def __init__(self, manager: GUIManager, master: ttk.Widget):
         self._manager = manager
-        self.icon: None  # type: ignore[unused-ignore]
+        self.icon = None  # No tray icon when system tray is disabled
         self._icon_images: dict[str, Image_module.Image] = {
             "pickaxe": Image_module.open(resource_path("icons/pickaxe.ico")),
             "active": Image_module.open(resource_path("icons/active.ico")),
@@ -1082,8 +1082,8 @@ class TrayIcon:
             "maint": Image_module.open(resource_path("icons/maint.ico")),
         }
         self._icon_state: str = "pickaxe"
-        self._button = ttk.Button(master, command=self.minimize, text=_("gui", "tray", "minimize"))
-        self._button.grid(column=0, row=0, sticky="ne")
+        #self._button = ttk.Button(master, command=self.minimize, text=_("gui", "tray", "minimize"))
+        #self._button.grid(column=0, row=0, sticky="ne")
 
     def __del__(self) -> None:
         self.stop()
@@ -1138,7 +1138,7 @@ class TrayIcon:
         #    "twitch_miner", self._icon_images[self._icon_state], self.get_title(drop), menu
         #)
         # self.icon.run_detached()
-        loop.run_in_executor(None, self.icon.run)
+        # loop.run_in_executor(None, self.icon.run)
 
     def stop(self):
         if self.icon is not None:

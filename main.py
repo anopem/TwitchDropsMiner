@@ -122,7 +122,7 @@ if __name__ == "__main__":
     except Exception:
         messagebox.showerror(
             "Settings error",
-            f"There was an error while loading the settings file:\n\n{traceback.format_exc()}"
+            f"There was an error while loading the settings file.\nThis is a docker permissions issue or you mounted the wrong folder.\nCheck the readme at https://github.com/fireph/docker-twitch-drops-miner.\nDO NOT report this issue to the DevilXD/TwitchDropsMiner repository!\n\n{traceback.format_exc()}"
         )
         sys.exit(4)
     # dummy window isn't needed anymore

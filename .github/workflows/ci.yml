@@ -42,6 +42,7 @@ jobs:
           fi
 
   windows:
+    if: false
     name: Windows
     runs-on: windows-latest
     needs:
@@ -107,6 +108,7 @@ jobs:
           path: Twitch.Drops.Miner.Windows.zip
 
   linux-pyinstaller:
+    if: false
     name: Linux (PyInstaller) (${{matrix.arch}})
     strategy:
       fail-fast: false
@@ -248,8 +250,8 @@ jobs:
     name: Upload builds to Releases
     if: github.event_name != 'pull_request'
     needs:
-      - windows
-      - linux-pyinstaller
+      # - windows
+      # - linux-pyinstaller
       - linux-appimage
     runs-on: ubuntu-latest
     permissions:

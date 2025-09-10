@@ -43,6 +43,7 @@ from constants import (
     OUTPUT_FORMATTER,
     State,
     PriorityMode,
+    FILE_FORMATTER,
 )
 if sys.platform == "win32":
     from registry import RegistryKey, ValueType, ValueNotFound
@@ -822,7 +823,19 @@ class ConsoleOutput:
         self._text.insert("end", f"{stamp}: {message}\n")
         self._text.see("end")  # scroll to the newly added line
         self._text.config(state="disabled")
-        print(f"{stamp}: {message}")
+        now = datetime.now()
+        record = logging.LogRecord(
+            name="GUI",
+            level=logging.INFO,
+            pathname="",
+            lineno=0,
+            msg=message,
+            args=(),
+            exc_info=None
+        )
+        record.created = now.timestamp()
+        record.msecs = now.microsecond / 1000
+        print(FILE_FORMATTER.format(record))
 
     def configure_theme(self, *, bg: str, fg: str, sel_bg: str, sel_fg: str):
         # Apply colors to the Tk Text widget used for console output

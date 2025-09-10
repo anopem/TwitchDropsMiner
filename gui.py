@@ -828,7 +828,6 @@ class ConsoleOutput:
         self._text.see("end")  # scroll to the newly added line
         self._text.config(state="disabled")
         if self._manager._twitch.settings.stdlog:
-            now = datetime.now()
             record = logging.LogRecord(
                 name="GUI",
                 level=logging.INFO,
@@ -838,8 +837,6 @@ class ConsoleOutput:
                 args=(),
                 exc_info=None
             )
-            record.created = now.timestamp()
-            record.msecs = now.microsecond / 1000
             print(FILE_FORMATTER.format(record))
 
     def configure_theme(self, *, bg: str, fg: str, sel_bg: str, sel_fg: str):

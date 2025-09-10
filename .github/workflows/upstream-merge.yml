@@ -2,8 +2,8 @@ name: Merge Upstream
 
 on:
   schedule:
-    # Run daily at 2 AM UTC
-    - cron: '0 2 * * *'
+    # Run every 6 hours
+    - cron: '0 */6 * * *'
   workflow_dispatch: # Allow manual triggering
 
 jobs:
@@ -48,6 +48,12 @@ jobs:
         if: steps.check-changes.outputs.behind > 0
         run: |
           git push origin no-sys-tray
+      
+      - name: Trigger CI workflow
+        if: steps.check-changes.outputs.behind > 0
+        uses: peter-evans/repository-dispatch@v3
+        with:
+          event-type: upstream-merged
       
       - name: Create summary
         run: |

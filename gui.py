@@ -814,6 +814,7 @@ class ConsoleOutput:
         self._text.grid(column=0, row=0, sticky="nsew")
         xscroll.grid(column=0, row=1, sticky="ew")
         yscroll.grid(column=1, row=0, sticky="ns")
+        self._manager = manager
 
     def print(self, message: str):
         stamp = datetime.now().strftime("%X")
@@ -823,19 +824,20 @@ class ConsoleOutput:
         self._text.insert("end", f"{stamp}: {message}\n")
         self._text.see("end")  # scroll to the newly added line
         self._text.config(state="disabled")
-        now = datetime.now()
-        record = logging.LogRecord(
-            name="GUI",
-            level=logging.INFO,
-            pathname="",
-            lineno=0,
-            msg=message,
-            args=(),
-            exc_info=None
-        )
-        record.created = now.timestamp()
-        record.msecs = now.microsecond / 1000
-        print(FILE_FORMATTER.format(record))
+        if self._manager._twitch.settings.stdlog:
+            now = datetime.now()
+            record = logging.LogRecord(
+                name="GUI",
+                level=logging.INFO,
+                pathname="",
+                lineno=0,
+                msg=message,
+                args=(),
+                exc_info=None
+            )
+            record.created = now.timestamp()
+            record.msecs = now.microsecond / 1000
+            print(FILE_FORMATTER.format(record))
 
     def configure_theme(self, *, bg: str, fg: str, sel_bg: str, sel_fg: str):
         # Apply colors to the Tk Text widget used for console output

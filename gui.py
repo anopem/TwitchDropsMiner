@@ -822,8 +822,6 @@ class ConsoleOutput:
         self._text.insert("end", f"{stamp}: {message}\n")
         self._text.see("end")  # scroll to the newly added line
         self._text.config(state="disabled")
-        logger = logging.getLogger("TwitchDrops")
-        logger.info(f"{stamp}: {message}")
 
     def configure_theme(self, *, bg: str, fg: str, sel_bg: str, sel_fg: str):
         # Apply colors to the Tk Text widget used for console output

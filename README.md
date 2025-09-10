@@ -2,6 +2,9 @@
 
 This application allows you to AFK mine timed Twitch drops, without having to worry about switching channels when the one you were watching goes offline, claiming the drops, or even receiving the stream data itself. This helps you save on bandwidth and hassle. This is a fork meant to be run inside Docker.
 
+> [!WARNING]
+> Anything below this point is for running the application normally, NOT in docker. Go to https://github.com/fireph/docker-twitch-drops-miner to learn about how to run it in Docker.
+
 ### How It Works:
 
 Every several seconds, the application pretends to watch a particular stream by fetching stream metadata - this is enough to advance the drops. Note that this completely bypasses the need to download any actual stream video and sound. To keep the status (ONLINE or OFFLINE) of the channels up-to-date, there's a websocket connection established that receives events about streams going up or down, or updates regarding the current amount of viewers.

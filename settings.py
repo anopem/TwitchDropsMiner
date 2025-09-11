@@ -5,7 +5,7 @@ from typing import Any, TypedDict, TYPE_CHECKING
 from yarl import URL
 
 from utils import json_load, json_save
-from constants import SETTINGS_PATH, DEFAULT_LANG, PriorityMode
+from constants import CONFIG_PATH, SETTINGS_PATH, DEFAULT_LANG, PriorityMode
 
 if TYPE_CHECKING:
     from main import ParsedArgs
@@ -66,6 +66,7 @@ class Settings:
     PASSTHROUGH = ("_settings", "_args", "_altered")
 
     def __init__(self, args: ParsedArgs):
+        CONFIG_PATH.mkdir(parents=True, exist_ok=True)
         self._settings: SettingsFile = json_load(SETTINGS_PATH, default_settings)
         self._args: ParsedArgs = args
         self._altered: bool = False

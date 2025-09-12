@@ -2,6 +2,17 @@
 
 This application allows you to AFK mine timed Twitch drops, without having to worry about switching channels when the one you were watching goes offline, claiming the drops, or even receiving the stream data itself. This helps you save on bandwidth and hassle. This is a fork of https://github.com/DevilXD/TwitchDropsMiner meant to be run inside Docker. It also only builds the AppImage for linux, for that reason.
 
+### Docker Fork Modifications:
+This fork has been specifically modified for Docker deployment with the following key changes:
+- **System tray removed** - All system tray functionality has been disabled
+- **Console logging** - Added `--stdlog` command line option to output logs to stdout/stderr
+- **Streamlined settings** - Moved settings into ./config folder
+- **AppImage only** - Build process modified to only generate Linux AppImage builds
+- **Automated upstream sync** - Daily workflow to automatically merge updates from the upstream repository
+- **Enhanced error handling** - Improved error messages when settings files can't be loaded
+- **URL management** - Login URLs are copied to clipboard
+- **About tab links** - Repository URL updated in about tab
+
 > [!WARNING]
 > Anything below this point is for running the application normally, NOT in docker. Go to https://github.com/fireph/docker-twitch-drops-miner to learn about how to run it in Docker. DO NOT report any Docker issues to https://github.com/DevilXD/TwitchDropsMiner!
 

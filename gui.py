@@ -594,9 +594,8 @@ class LoginForm:
         await self.wait_for_login_press()
         self._manager.print(f"Enter this code on the Twitch's device activation page: {user_code}")
         twitch_login_url = f"https://www.twitch.tv/activate?device-code={user_code}"
-        r = tk.Tk()
-        r.clipboard_clear()
-        r.clipboard_append(twitch_login_url)
+        self._manager._root.clipboard_clear()
+        self._manager._root.clipboard_append(twitch_login_url)
         self._manager.print(f"'{twitch_login_url}' copied to clipboard.")
         await asyncio.sleep(4)
         webopen(page_url)

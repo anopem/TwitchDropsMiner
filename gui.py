@@ -593,6 +593,11 @@ class LoginForm:
         self._manager.print(_("gui", "login", "request"))
         await self.wait_for_login_press()
         self._manager.print(f"Enter this code on the Twitch's device activation page: {user_code}")
+        twitch_login_url = f"https://www.twitch.tv/activate?device-code={user_code}"
+        r = tk.Tk()
+        r.clipboard_clear()
+        r.clipboard_append(twitch_login_url)
+        self._manager.print(f"'{twitch_login_url}' copied to clipboard.")
         await asyncio.sleep(4)
         webopen(page_url)
 
@@ -1994,14 +1999,14 @@ class HelpTab:
             about, text="Application created by: ", anchor="e"
         ).grid(column=0, row=0, sticky="nsew")
         LinkLabel(
-            about, link="https://github.com/DevilXD", text="DevilXD"
+            about, link="https://github.com/DevilXD", text="DevilXD/fireph"
         ).grid(column=1, row=0, sticky="nsew")
         # About - repo link
         ttk.Label(about, text="Repository: ", anchor="e").grid(column=0, row=1, sticky="nsew")
         LinkLabel(
             about,
-            link="https://github.com/DevilXD/TwitchDropsMiner",
-            text="https://github.com/DevilXD/TwitchDropsMiner",
+            link="https://github.com/fireph/docker-twitch-drops-miner",
+            text="https://github.com/fireph/docker-twitch-drops-miner",
         ).grid(column=1, row=1, sticky="nsew")
         # About - donate
         ttk.Separator(

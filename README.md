@@ -4,13 +4,13 @@ This application allows you to AFK mine timed Twitch drops, without having to wo
 
 ### Docker Fork Modifications:
 This fork has been specifically modified for Docker deployment with the following key changes:
-- **System tray removed** - All system tray functionality has been disabled
+- **System tray removed** - All system tray functionality has been disabled and runtime dependencies removed
 - **Console logging** - Added `--stdlog` command line option to output logs to stdout/stderr
 - **Streamlined settings** - Moved settings into ./config folder
 - **AppImage only** - Build process modified to only generate Linux AppImage builds
-- **Automated upstream sync** - Daily workflow to automatically merge updates from the upstream repository
+- **Automated upstream sync** - Automated workflow to automatically merge updates from the upstream repository
 - **Enhanced error handling** - Improved error messages when settings files can't be loaded
-- **URL management** - Login URLs are copied to clipboard
+- **Login URL management** - Login URLs are copied to clipboard
 - **About tab links** - Repository URL updated in about tab
 
 > [!WARNING]

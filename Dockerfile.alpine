@@ -1,0 +1,44 @@
+# Multi-stage build for Alpine Linux
+FROM python:alpine AS builder
+
+# Build argument for architecture
+ARG ARCH=x86_64
+
+# Install build dependencies
+RUN apk add --no-cache \
+    build-base \
+    python3-dev \
+    python3-tkinter \
+    libXft \
+    musl-dev \
+    zlib-dev \
+    jpeg-dev \
+    freetype-dev \
+    7zip \
+    tk-dev \
+    tcl-dev
+
+# Set working directory
+WORKDIR /app
+
+# Copy source code
+COPY . .
+
+# Setup venv and install Python dependencies
+RUN python3 -m venv env && \
+    . env/bin/activate && \
+    pip install wheel && \
+    pip install --no-cache-dir -r requirements.txt && \
+    pip install pyinstaller
+
+# Build the application
+RUN . env/bin/activate && pyinstaller build.spec
+
+# Show PyInstaller warnings
+RUN cat build/build/warn-build.txt || true
+
+# Create release folder and archive
+RUN folder='Twitch Drops Miner' && \
+    mkdir "${folder}" && \
+    cp manual.txt dist/* "${folder}" && \
+    7z a "Twitch.Drops.Miner.Linux.musl.PyInstaller-${ARCH}.zip" "${folder}"

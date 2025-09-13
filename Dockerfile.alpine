@@ -9,7 +9,7 @@ RUN apk add --no-cache \
     build-base \
     python3-dev \
     python3-tkinter \
-    libXft \
+    libxft-dev \
     musl-dev \
     zlib-dev \
     jpeg-dev \

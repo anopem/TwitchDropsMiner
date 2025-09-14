@@ -312,8 +312,8 @@ jobs:
     needs:
       # - windows
       # - linux-pyinstaller
-      - linux-appimage
-      - linux-alpine
+      # - linux-appimage
+      - linux-pyinstaller-musl
     runs-on: ubuntu-latest
     permissions:
       contents: write

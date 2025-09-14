@@ -189,6 +189,7 @@ jobs:
           path: Twitch.Drops.Miner.Linux.PyInstaller-${{matrix.arch}}.zip
 
   linux-appimage:
+    if: false
     name: Linux (AppImage) (${{matrix.arch}})
     strategy:
       fail-fast: false
@@ -244,8 +245,8 @@ jobs:
           name: Twitch.Drops.Miner.Linux.AppImage-${{matrix.arch}}
           path: Twitch.Drops.Miner.Linux.AppImage-${{matrix.arch}}.zip
 
-  linux-alpine:
-    name: Linux (Alpine Docker) (${{matrix.arch}})
+  linux-pyinstaller-musl:
+    name: Linux (PyInstaller musl) (${{matrix.arch}})
     strategy:
       fail-fast: false
       matrix:

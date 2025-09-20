@@ -23,3 +23,10 @@ settings.json
 /appimage-build
 /*.AppImage
 /*.AppImage.zsync
+build.bat
+build.sh
+setup_env.bat
+setup_env.sh
+.idea/*
+.venv/*
+.vscode/*

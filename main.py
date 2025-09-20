@@ -7,6 +7,7 @@ from multiprocessing import freeze_support
 if __name__ == "__main__":
     freeze_support()
     import io
+    import os
     import sys
     import signal
     import asyncio
@@ -39,6 +40,9 @@ if __name__ == "__main__":
 
     if sys.version_info < (3, 10):
         raise RuntimeError("Python 3.10 or higher is required")
+
+    if os.path.exists('/TwitchDropsMiner/.crash'):
+        os.remove('/TwitchDropsMiner/.crash')
 
     class Parser(argparse.ArgumentParser):
         def __init__(self, *args, **kwargs) -> None:

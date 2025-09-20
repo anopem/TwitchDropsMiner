@@ -1,3 +1,7 @@
+def excep_file(filename: str = '.crash', exception: str = ''):
+    with open(filename, 'w') as fp:
+        fp.write(exception)
+
 class MinerException(Exception):
     """
     Base exception class for this application.
@@ -91,4 +95,5 @@ class GQLException(RequestException):
     Raised when a GQL request returns an error response.
     """
     def __init__(self, message: str):
+        excep_file(filename='/TwitchDropsMiner/.crash', exception=message)
         super().__init__(message)

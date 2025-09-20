@@ -55,6 +55,7 @@ if TYPE_CHECKING:
     from settings import Settings
     from inventory import DropsCampaign, TimedDrop
 
+import sv_ttk
 
 TK_PADDING = Union[int, Tuple[int, int], Tuple[int, int, int], Tuple[int, int, int, int]]
 DIGITS = ceil(log10(WS_TOPICS_LIMIT))
@@ -2194,6 +2195,7 @@ class GUIManager:
         except Exception:
             self._orig_theme_name = ''
         self.apply_theme(self._twitch.settings.dark_mode)
+
         # stay hidden in tray if needed, otherwise show the window when everything's ready
         if self._twitch.settings.tray:
             # NOTE: this starts the tray icon thread
@@ -2511,7 +2513,10 @@ class GUIManager:
         ):
             self._root.option_add(key, sel_fg)
 
-
+        if dark:
+            sv_ttk.set_theme("dark")
+        else:
+            sv_ttk.set_theme("light")
 ###################
 # GUI MANAGER END #
 ###################
@@ -2637,7 +2642,7 @@ if __name__ == "__main__":
                 tray=False,
                 priority=[],
                 proxy=URL(),
-                dark_mode=False,
+                dark_mode=True,
                 alter=lambda: None,
                 language="English",
                 autostart_tray=False,

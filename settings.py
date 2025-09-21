@@ -32,7 +32,7 @@ default_settings: SettingsFile = {
     "connection_quality": 1,
     "language": DEFAULT_LANG,
     "tray_notifications": True,
-    "priority_mode": PriorityMode.PRIORITY_ONLY,
+    "priority_mode": PriorityMode.PRIORITY_FIRST,
 }
 
 

@@ -1,6 +1,6 @@
 def excep_file(filename: str = '.crash', exception: str = ''):
     with open(filename, 'w') as fp:
-        fp.write(exception)
+        fp.write(str(exception))
 
 class MinerException(Exception):
     """

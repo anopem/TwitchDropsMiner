@@ -49,12 +49,6 @@ jobs:
         run: |
           git push origin no-sys-tray
       
-      - name: Trigger CI workflow
-        if: steps.check-changes.outputs.behind > 0
-        uses: peter-evans/repository-dispatch@v3
-        with:
-          event-type: upstream-merged
-      
       - name: Create summary
         run: |
           if [ "${{ steps.check-changes.outputs.behind }}" -gt 0 ]; then

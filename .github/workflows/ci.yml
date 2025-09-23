@@ -6,8 +6,6 @@ on:
       - "no-sys-tray"
   pull_request:
   workflow_dispatch:
-  repository_dispatch:
-    types: [upstream-merged]
 
 env:
   PYTHON_VERSION: "3.10"

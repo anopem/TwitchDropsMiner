@@ -16,7 +16,7 @@ log.txt
 /dump.dat
 /lock.file
 settings.json
-cookies.jar
+*.jar
 /lang/English.json
 # AppImage
 /AppDir
@@ -24,3 +24,10 @@ cookies.jar
 /appimage-build
 /*.AppImage
 /*.AppImage.zsync
+build.bat
+build.sh
+setup_env.bat
+setup_env.sh
+.idea/*
+.venv/*
+.vscode/*

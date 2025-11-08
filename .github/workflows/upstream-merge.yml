@@ -18,7 +18,7 @@ jobs:
         with:
           token: ${{ secrets.PAT_TOKEN }}
           fetch-depth: 0
-          ref: no-sys-tray
+          ref: no-link
       
       - name: Configure Git
         run: |
@@ -27,14 +27,14 @@ jobs:
       
       - name: Add upstream remote
         run: |
-          git remote add upstream https://github.com/DevilXD/TwitchDropsMiner.git
+          git remote add upstream https://github.com/fireph/TwitchDropsMiner.git
           git fetch upstream
       
       - name: Check for changes
         id: check-changes
         run: |
-          # Check if there are any new commits in upstream/master
-          BEHIND=$(git rev-list --count HEAD..upstream/master)
+          # Check if there are any new commits in upstream/no-sys-tray
+          BEHIND=$(git rev-list --count HEAD..upstream/no-sys-tray)
           echo "behind=$BEHIND" >> $GITHUB_OUTPUT
           echo "Commits behind upstream: $BEHIND"
       
@@ -42,12 +42,12 @@ jobs:
         if: steps.check-changes.outputs.behind > 0
         run: |
           echo "Merging ${{ steps.check-changes.outputs.behind }} new commits from upstream"
-          git merge upstream/master --no-edit
+          git merge upstream/no-sys-tray --no-edit
       
       - name: Push changes
         if: steps.check-changes.outputs.behind > 0
         run: |
-          git push origin no-sys-tray
+          git push origin no-link
       
       - name: Create summary
         run: |

@@ -27,12 +27,12 @@ default_settings: SettingsFile = {
     "proxy": URL(),
     "priority": [],
     "exclude": set(),
-    "dark_mode": False,
+    "dark_mode": True,
     "autostart_tray": False,
     "connection_quality": 1,
     "language": DEFAULT_LANG,
     "tray_notifications": True,
-    "priority_mode": PriorityMode.PRIORITY_ONLY,
+    "priority_mode": PriorityMode.PRIORITY_FIRST,
 }
 
 

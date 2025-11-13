@@ -21,6 +21,7 @@ class SettingsFile(TypedDict):
     connection_quality: int
     tray_notifications: bool
     priority_mode: PriorityMode
+    graphql: str
 
 
 default_settings: SettingsFile = {
@@ -33,6 +34,7 @@ default_settings: SettingsFile = {
     "language": DEFAULT_LANG,
     "tray_notifications": True,
     "priority_mode": PriorityMode.PRIORITY_FIRST,
+    "graphql": 'https://raw.githubusercontent.com/anopem/TwitchDropsMiner/refs/heads/external-gql/graphql/graphql.json',
 }
 
 
@@ -56,6 +58,7 @@ class Settings:
     connection_quality: int
     tray_notifications: bool
     priority_mode: PriorityMode
+    graphql: str
 
     PASSTHROUGH = ("_settings", "_args", "_altered")
 

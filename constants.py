@@ -2,13 +2,16 @@ from __future__ import annotations
 
 import os
 import sys
+import json
 import random
 import logging
+import urllib.request
 from pathlib import Path
 from copy import deepcopy
 from enum import Enum, auto
 from datetime import timedelta
 from typing import Any, Dict, Literal, NewType, TYPE_CHECKING
+from urllib.error import HTTPError, URLError
 
 from yarl import URL
 
@@ -108,6 +111,7 @@ CACHE_PATH = Path(WORKING_DIR, "cache")
 CACHE_DB = Path(CACHE_PATH, "mapping.json")
 COOKIES_PATH = Path(CONFIG_PATH, "cookies.jar")
 SETTINGS_PATH = Path(CONFIG_PATH, "settings.json")
+GRAPHQL_PATH = Path(CONFIG_PATH, "graphql.json")
 # Typing
 JsonType = Dict[str, Any]
 URLType = NewType("URLType", str)
@@ -290,157 +294,200 @@ class GQLOperation(JsonType):
         return modified
 
 
-GQL_OPERATIONS: dict[str, GQLOperation] = {
-    # returns stream information for a particular channel
-    "GetStreamInfo": GQLOperation(
-        "VideoPlayerStreamInfoOverlayChannel",
-        "198492e0857f6aedead9665c81c5a06d67b25b58034649687124083ff288597d",
-        variables={
-            "channel": ...,  # channel login
-        },
-    ),
-    # can be used to claim channel points
-    "ClaimCommunityPoints": GQLOperation(
-        "ClaimCommunityPoints",
-        "46aaeebe02c99afdf4fc97c7c0cba964124bf6b0af229395f1f6d1feed05b3d0",
-        variables={
-            "input": {
-                "claimID": ...,  # points claim_id
-                "channelID": ...,  # channel ID as a str
-            },
-        },
-    ),
-    # can be used to claim a drop
-    "ClaimDrop": GQLOperation(
-        "DropsPage_ClaimDropRewards",
-        "a455deea71bdc9015b78eb49f4acfbce8baa7ccbedd28e549bb025bd0f751930",
-        variables={
-            "input": {
-                "dropInstanceID": ...,  # drop claim_id
-            },
-        },
-    ),
-    # returns current state of points (balance, claim available) for a particular channel
-    "ChannelPointsContext": GQLOperation(
-        "ChannelPointsContext",
-        "374314de591e69925fce3ddc2bcf085796f56ebb8cad67a0daa3165c03adc345",
-        variables={
-            "channelLogin": ...,  # channel login
-        },
-    ),
-    # returns all in-progress campaigns
-    "Inventory": GQLOperation(
-        "Inventory",
-        "d86775d0ef16a63a33ad52e80eaff963b2d5b72fada7c991504a57496e1d8e4b",
-        variables={
-            "fetchRewardCampaigns": False,
-        }
-    ),
-    # returns current state of drops (current drop progress)
-    "CurrentDrop": GQLOperation(
-        "DropCurrentSessionContext",
-        "4d06b702d25d652afb9ef835d2a550031f1cf762b193523a92166f40ea3d142b",
-        variables={
-            "channelID": ...,  # watched channel ID as a str
-            "channelLogin": "",  # always empty string
-        },
-    ),
-    # returns all available campaigns
-    "Campaigns": GQLOperation(
-        "ViewerDropsDashboard",
-        "5a4da2ab3d5b47c9f9ce864e727b2cb346af1e3ea8b897fe8f704a97ff017619",
-        variables={
-            "fetchRewardCampaigns": False,
-        }
-    ),
-    # returns extended information about a particular campaign
-    "CampaignDetails": GQLOperation(
-        "DropCampaignDetails",
-        "039277bf98f3130929262cc7c6efd9c141ca3749cb6dca442fc8ead9a53f77c1",
-        variables={
-            "channelLogin": ...,  # user login
-            "dropID": ...,  # campaign ID
-        },
-    ),
-    # returns drops available for a particular channel
-    "AvailableDrops": GQLOperation(
-        "DropsHighlightService_AvailableDrops",
-        "9a62a09bce5b53e26e64a671e530bc599cb6aab1e5ba3cbd5d85966d3940716f",
-        variables={
-            "channelID": ...,  # channel ID as a str
-        },
-    ),
-    # retuns stream playback access token
-    "PlaybackAccessToken": GQLOperation(
-        "PlaybackAccessToken",
-        "ed230aa1e33e07eebb8928504583da78a5173989fadfb1ac94be06a04f3cdbe9",
-        variables={
-            "isLive": True,
-            "isVod": False,
-            "login": ...,  # channel login
-            "platform": "web",
-            "playerType": "site",
-            "vodID": "",
-        },
-    ),
-    # returns live channels for a particular game
-    "GameDirectory": GQLOperation(
-        "DirectoryPage_Game",
-        "98a996c3c3ebb1ba4fd65d6671c6028d7ee8d615cb540b0731b3db2a911d3649",
-        variables={
-            "imageWidth": 50,
-            "slug": ...,  # game slug
-            "options": {
-                "broadcasterLanguages": [],
-                "freeformTags": None,
-                "includeRestricted": ["SUB_ONLY_LIVE"],
-                "recommendationsContext": {"platform": "web"},
-                "sort": "RELEVANCE",  # also accepted: "VIEWER_COUNT"
-                "systemFilters": [],
-                "tags": [],
-                "requestID": "JIRA-VXP-2397",
-            },
-            "sortTypeIsRecency": False,
-            "limit": 30,  # limit of channels returned
-            "includeCostreaming": False,
-        },
-    ),
-    "SlugRedirect": GQLOperation(  # can be used to turn game name -> game slug
-        "DirectoryGameRedirect",
-        "1f0300090caceec51f33c5e20647aceff9017f740f223c3c532ba6fa59f6b6cc",
-        variables={
-            "name": ...,  # game name
-        },
-    ),
-    "NotificationsView": GQLOperation(  # unused, triggers notifications "update-summary"
-        "OnsiteNotifications_View",
-        "e8e06193f8df73d04a1260df318585d1bd7a7bb447afa058e52095513f2bfa4f",
-        variables={
-            "input": {},
-        },
-    ),
-    "NotificationsList": GQLOperation(  # unused
-        "OnsiteNotifications_ListNotifications",
-        "11cdb54a2706c2c0b2969769907675680f02a6e77d8afe79a749180ad16bfea6",
-        variables={
-            "cursor": "",
-            "displayType": "VIEWER",
-            "language": "en",
-            "limit": 10,
-            "shouldLoadLastBroadcast": False,
-        },
-    ),
-    "NotificationsDelete": GQLOperation(
-        "OnsiteNotifications_DeleteNotification",
-        "13d463c831f28ffe17dccf55b3148ed8b3edbbd0ebadd56352f1ff0160616816",
-        variables={
-            "input": {
-                "id": "",  # ID of the notification to delete
-            }
-        },
-    ),
-}
+def load_qgl():
+    """
+    Read GQL from a json file so we can change them around without needing to recompile the entire executable.
+    """
+    if not Path.exists(GRAPHQL_PATH):
+        with (open(GRAPHQL_PATH, 'w+', encoding='utf-8') as GQL_WRITER):
+            _GQL = [
+                {
+                    "operation": "GetStreamInfo",
+                    "name": "VideoPlayerStreamInfoOverlayChannel",
+                    "sha256": "198492e0857f6aedead9665c81c5a06d67b25b58034649687124083ff288597d",
+                    "variables": {
+                        "channel": "..."
+                    }
+                },
+                {
+                    "operation": "ClaimCommunityPoints",
+                    "name": "ClaimCommunityPoints",
+                    "sha256": "46aaeebe02c99afdf4fc97c7c0cba964124bf6b0af229395f1f6d1feed05b3d0",
+                    "variables": {
+                        "input": {
+                            "claimID": "...",
+                            "channelID": "..."
+                        }
+                    }
+                },
+                {
+                    "operation": "ClaimDrop",
+                    "name": "DropsPage_ClaimDropRewards",
+                    "sha256": "a455deea71bdc9015b78eb49f4acfbce8baa7ccbedd28e549bb025bd0f751930",
+                    "variables": {
+                        "input": {
+                            "dropInstanceID": "..."
+                        }
+                    }
+                },
+                {
+                    "operation": "ChannelPointsContext",
+                    "name": "ChannelPointsContext",
+                    "sha256": "374314de591e69925fce3ddc2bcf085796f56ebb8cad67a0daa3165c03adc345",
+                    "variables": {
+                        "channelLogin": "..."
+                    }
+                },
+                {
+                    "operation": "Inventory",
+                    "name": "Inventory",
+                    "sha256": "d86775d0ef16a63a33ad52e80eaff963b2d5b72fada7c991504a57496e1d8e4b",
+                    "variables": {
+                        "fetchRewardCampaigns": False
+                    }
+                },
+                {
+                    "operation": "CurrentDrop",
+                    "name": "DropCurrentSessionContext",
+                    "sha256": "4d06b702d25d652afb9ef835d2a550031f1cf762b193523a92166f40ea3d142b",
+                    "variables": {
+                        "channelID": "...",
+                        "channelLogin": ""
+                    }
+                },
+                {
+                    "operation": "Campaigns",
+                    "name": "ViewerDropsDashboard",
+                    "sha256": "5a4da2ab3d5b47c9f9ce864e727b2cb346af1e3ea8b897fe8f704a97ff017619",
+                    "variables": {
+                        "fetchRewardCampaigns": False
+                    }
+                },
+                {
+                    "operation": "CampaignDetails",
+                    "name": "DropCampaignDetails",
+                    "sha256": "039277bf98f3130929262cc7c6efd9c141ca3749cb6dca442fc8ead9a53f77c1",
+                    "variables": {
+                        "channelLogin": "...",
+                        "dropID": "..."
+                    }
+                },
+                {
+                    "operation": "AvailableDrops",
+                    "name": "DropsHighlightService_AvailableDrops",
+                    "sha256": "9a62a09bce5b53e26e64a671e530bc599cb6aab1e5ba3cbd5d85966d3940716f",
+                    "variables": {
+                        "channelID": "..."
+                    }
+                },
+                {
+                    "operation": "PlaybackAccessToken",
+                    "name": "PlaybackAccessToken",
+                    "sha256": "ed230aa1e33e07eebb8928504583da78a5173989fadfb1ac94be06a04f3cdbe9",
+                    "variables": {
+                        "isLive": True,
+                        "isVod": False,
+                        "login": "...",
+                        "platform": "web",
+                        "playerType": "site",
+                        "vodID": ""
+                    }
+                },
+                {
+                    "operation": "GameDirectory",
+                    "name": "DirectoryPage_Game",
+                    "sha256": "98a996c3c3ebb1ba4fd65d6671c6028d7ee8d615cb540b0731b3db2a911d3649",
+                    "variables": {
+                        "imageWidth": 50,
+                        "slug": "...",
+                        "options": {
+                            "broadcasterLanguages": [],
+                            "freeformTags": None,
+                            "includeRestricted": [
+                                "SUB_ONLY_LIVE"
+                            ],
+                            "recommendationsContext": {
+                                "platform": "web"
+                            },
+                            "sort": "RELEVANCE",
+                            "systemFilters": [],
+                            "tags": [],
+                            "requestID": "JIRA-VXP-2397"
+                        },
+                        "sortTypeIsRecency": False,
+                        "limit": 30,
+                        "includeCostreaming": False
+                    }
+                },
+                {
+                    "operation": "SlugRedirect",
+                    "name": "DirectoryGameRedirect",
+                    "sha256": "1f0300090caceec51f33c5e20647aceff9017f740f223c3c532ba6fa59f6b6cc",
+                    "variables": {
+                        "name": "..."
+                    }
+                },
+                {
+                    "operation": "NotificationsView",
+                    "name": "OnsiteNotifications_View",
+                    "sha256": "e8e06193f8df73d04a1260df318585d1bd7a7bb447afa058e52095513f2bfa4f",
+                    "variables": {
+                        "input": {}
+                    }
+                },
+                {
+                    "operation": "NotificationsList",
+                    "name": "OnsiteNotifications_ListNotifications",
+                    "sha256": "11cdb54a2706c2c0b2969769907675680f02a6e77d8afe79a749180ad16bfea6",
+                    "variables": {
+                        "cursor": "",
+                        "displayType": "VIEWER",
+                        "language": "en",
+                        "limit": 10,
+                        "shouldLoadLastBroadcast": False
+                    }
+                },
+                {
+                    "operation": "NotificationsDelete",
+                    "name": "OnsiteNotifications_DeleteNotification",
+                    "sha256": "13d463c831f28ffe17dccf55b3148ed8b3edbbd0ebadd56352f1ff0160616816",
+                    "variables": {
+                        "input": {
+                            "id": ""
+                        }
+                    }
+                }
+            ]
+            json.dump(_GQL, GQL_WRITER, indent=4)
 
+    _GQL_OPERATIONS_JSON: dict = {}
+    _GQL_OPERATIONS: dict[str, GQLOperation] = {}
+    try:
+        with open(SETTINGS_PATH, encoding='utf-8') as _settings:
+            settings = json.load(_settings)
+            response = urllib.request.urlopen(settings['graphql'], timeout=10).read().decode('utf-8')
+        _GQL_OPERATIONS_JSON = json.loads(response)
+        with (open(GRAPHQL_PATH, 'w+', encoding='utf-8') as GQL_WRITER):
+            json.dump(_GQL_OPERATIONS_JSON, GQL_WRITER, indent=4)
+        print('Reading graphql from online source.')
+    except URLError as error:
+        # Fallback to load local graphql file
+        print('Unable to reach online graphql, fallback to local version.')
+        with open(GRAPHQL_PATH, encoding='utf-8') as GQL:
+            _GQL_OPERATIONS_JSON = json.loads(GQL.read())
+
+    _GQL_OPERATIONS: dict[str, GQLOperation] = {}
+    for OPERATION in _GQL_OPERATIONS_JSON:
+        _update = dict((key, Ellipsis) for key, val in OPERATION['variables'].items() if val == '...')
+        OPERATION['variables'].update(_update)
+        _GQL_OPERATIONS[OPERATION['operation']] = GQLOperation(
+            name=OPERATION['name'],
+            sha256=OPERATION['sha256'],
+            variables=OPERATION['variables']
+        )
+    return _GQL_OPERATIONS
+
+GQL_OPERATIONS: dict[str, GQLOperation] = load_qgl()
 
 class WebsocketTopic:
     def __init__(

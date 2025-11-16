@@ -166,6 +166,12 @@ class GUISettingsGeneral(TypedDict):
     proxy: str
 
 
+class GUISettingsAdvanced(TypedDict):
+    name: str
+    enable_badges_emotes: str
+    available_drops_check: str
+
+
 class GUIPriorityModes(TypedDict):
     priority_first: str
     priority_only: str
@@ -175,6 +181,7 @@ class GUIPriorityModes(TypedDict):
 
 class GUISettings(TypedDict):
     general: GUISettingsGeneral
+    advanced: GUISettingsAdvanced
     priority_modes: GUIPriorityModes
     game_name: str
     priority: str
@@ -366,6 +373,11 @@ default_translation: Translation = {
                 "dark_mode": "Dark mode: ",
                 "priority_mode": "Priority mode: ",
                 "proxy": "Proxy (requires restart):",
+            },
+            "advanced": {
+                "name": "Advanced",
+                "enable_badges_emotes": "Enable partial support for badges and emotes: ",
+                "available_drops_check": "Enable extra available drops check: ",
             },
             "priority_modes": {
                 "priority_first": "Priority list first",

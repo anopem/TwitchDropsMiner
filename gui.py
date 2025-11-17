@@ -567,7 +567,7 @@ class LoginForm:
         # ensure the window isn't hidden into tray when this runs
         self._manager.grab_attention(sound=False)
         while True:
-            self._manager.print(_("gui", "login", "request"))
+            self._manager.print(_("gui", "login", "request"), "yellow")
             await self.wait_for_login_press()
             login_data = LoginData(
                 self._login_entry.get().strip(),
@@ -593,9 +593,9 @@ class LoginForm:
         self.update(_("gui", "login", "required"), None)
         # ensure the window isn't hidden into tray when this runs
         self._manager.grab_attention(sound=False)
-        self._manager.print(_("gui", "login", "request"))
+        self._manager.print(_("gui", "login", "request"), "yellow")
         await self.wait_for_login_press()
-        self._manager.print(f"Enter this code on the Twitch's device activation page: {user_code}")
+        self._manager.print(f"Enter this code on the Twitch's device activation page: {user_code}", "yellow")
         twitch_login_url = f"https://www.twitch.tv/activate?device-code={user_code}"
         self._manager._root.clipboard_clear()
         self._manager._root.clipboard_append(twitch_login_url)
@@ -823,12 +823,16 @@ class ConsoleOutput:
         yscroll.grid(column=1, row=0, sticky="ns")
         self._manager = manager
 
-    def print(self, message: str):
+    def print(self, message: str, tag: str = "neutral"):
         stamp = datetime.now().strftime("%X")
         if '\n' in message:
             message = message.replace('\n', f"\n{stamp}: ")
         self._text.config(state="normal")
-        self._text.insert("end", f"{stamp}: {message}\n")
+        self._text.tag_configure("red", lmargin1=15, lmargincolor="firebrick2")
+        self._text.tag_configure("yellow", lmargin1=15, lmargincolor="gold1")
+        self._text.tag_configure("green", lmargin1=15, lmargincolor="green3")
+        self._text.tag_configure("neutral", lmargin1=15) #, lmargincolor="gray80") # dodgerblue1
+        self._text.insert("end", f" {stamp}: {message}\n", tag)
         self._text.see("end")  # scroll to the newly added line
         self._text.config(state="disabled")
         if self._manager._twitch.settings.stdlog:
@@ -891,7 +895,7 @@ class ChannelList:
         scroll.grid(column=1, row=1, sticky="ns")
         self._font = Font(frame, manager._style.lookup("Treeview", "font"))
         self._const_width: set[str] = set()
-        table.tag_configure("watching", background="gray70")
+        table.tag_configure("watching", background="dodgerblue1", foreground="black")
         table.bind("<Button-1>", self._disable_column_resize)
         table.bind("<<TreeviewSelect>>", self._selected)
         self._add_column("#0", '', width=0)
@@ -2341,9 +2345,9 @@ class GUIManager:
         self.progress.display(None)
         self.tray.update_title(None)
 
-    def print(self, message: str):
+    def print(self, message: str, tag: str = "neutral"):
         # print to our custom output
-        self.output.print(message)
+        self.output.print(message, tag)
 
     def apply_theme(self, dark: bool) -> None:
         """

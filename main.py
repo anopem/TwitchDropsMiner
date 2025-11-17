@@ -173,22 +173,22 @@ if __name__ == "__main__":
         except CaptchaRequired:
             exit_status = 1
             client.prevent_close()
-            client.print(_("error", "captcha"))
+            client.print(_("error", "captcha"), "red")
         except Exception:
             exit_status = 1
             client.prevent_close()
-            client.print("Fatal error encountered:\n")
-            client.print(traceback.format_exc())
+            client.print("Fatal error encountered:\n", "red")
+            client.print(traceback.format_exc(), "red")
         finally:
             if sys.platform == "linux":
                 loop.remove_signal_handler(signal.SIGINT)
                 loop.remove_signal_handler(signal.SIGTERM)
-            client.print(_("gui", "status", "exiting"))
+            client.print(_("gui", "status", "exiting"), "red")
             await client.shutdown()
         if not client.gui.close_requested:
             # user didn't request the closure
             client.gui.tray.change_icon("error")
-            client.print(_("status", "terminated"))
+            client.print(_("status", "terminated"), "red")
             client.gui.status.update(_("gui", "status", "terminated"))
             # notify the user about the closure
             client.gui.grab_attention(sound=True)

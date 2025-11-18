@@ -567,7 +567,7 @@ class LoginForm:
         # ensure the window isn't hidden into tray when this runs
         self._manager.grab_attention(sound=False)
         while True:
-            self._manager.print(_("gui", "login", "request"), "yellow")
+            self._manager.print(_("gui", "login", "request"))
             await self.wait_for_login_press()
             login_data = LoginData(
                 self._login_entry.get().strip(),
@@ -593,13 +593,13 @@ class LoginForm:
         self.update(_("gui", "login", "required"), None)
         # ensure the window isn't hidden into tray when this runs
         self._manager.grab_attention(sound=False)
-        self._manager.print(_("gui", "login", "request"), "yellow")
+        self._manager.print(_("gui", "login", "request"))
         await self.wait_for_login_press()
-        self._manager.print(f"Enter this code on the Twitch's device activation page: {user_code}", "yellow")
+        self._manager.print(f"Enter this code on the Twitch's device activation page: {user_code}")
         twitch_login_url = f"https://www.twitch.tv/activate?device-code={user_code}"
         self._manager._root.clipboard_clear()
         self._manager._root.clipboard_append(twitch_login_url)
-        self._manager.print(f"'{twitch_login_url}' copied to clipboard.", "yellow")
+        self._manager.print(f"'{twitch_login_url}' copied to clipboard.")
         await asyncio.sleep(4)
         webopen(page_url)
 
@@ -823,18 +823,12 @@ class ConsoleOutput:
         yscroll.grid(column=1, row=0, sticky="ns")
         self._manager = manager
 
-    def print(self, message: str, tag: str = "neutral"):
+    def print(self, message: str):
         stamp = datetime.now().strftime("%X")
         if '\n' in message:
             message = message.replace('\n', f"\n{stamp}: ")
         self._text.config(state="normal")
-        self._text.tag_configure("ERROR", lmargin1=15, lmargincolor="firebrick2")
-        self._text.tag_configure("WARNING", lmargin1=15, lmargincolor="gold1")
-        self._text.tag_configure("red", lmargin1=15, lmargincolor="firebrick2")
-        self._text.tag_configure("yellow", lmargin1=15, lmargincolor="gold1")
-        self._text.tag_configure("green", lmargin1=15, lmargincolor="green3")
-        self._text.tag_configure("neutral", lmargin1=15) #, lmargincolor="gray80") # dodgerblue1
-        self._text.insert("end", f" {stamp}: {message}\n", tag)
+        self._text.insert("end", f"{stamp}: {message}\n")
         self._text.see("end")  # scroll to the newly added line
         self._text.config(state="disabled")
         if self._manager._twitch.settings.stdlog:
@@ -2391,9 +2385,9 @@ class GUIManager:
         self.progress.display(None)
         self.tray.update_title(None)
 
-    def print(self, message: str, tag: str = logging.getLevelName(logging.root.level)):
+    def print(self, message: str):
         # print to our custom output
-        self.output.print(message, tag)
+        self.output.print(message)
 
     def apply_theme(self, dark: bool) -> None:
         """

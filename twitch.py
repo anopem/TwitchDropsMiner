@@ -250,7 +250,7 @@ class _AuthState:
                     break
                 elif error_code in (2004, 3001):
                     logger.info("3001: Login failed due to incorrect username or password")
-                    gui_print(_("login", "incorrect_login_pass"), "red")
+                    gui_print(_("login", "incorrect_login_pass"))
                     if error_code == 2004:
                         # invalid username
                         login_form.clear(login=True)
@@ -263,10 +263,10 @@ class _AuthState:
                     logger.info("3012/23: Login failed due to incorrect 2FA code")
                     if error_code == 3023:
                         token_kind = "email"
-                        gui_print(_("login", "incorrect_email_code"), "red")
+                        gui_print(_("login", "incorrect_email_code"))
                     else:
                         token_kind = "authy"
-                        gui_print(_("login", "incorrect_twofa_code"), "red")
+                        gui_print(_("login", "incorrect_twofa_code"))
                     login_form.clear(token=True)
                     continue
                 elif error_code in (
@@ -278,10 +278,10 @@ class _AuthState:
                     # user didn't provide a token, so ask them for it
                     if error_code == 3022:
                         token_kind = "email"
-                        gui_print(_("login", "email_code_required"), "yellow")
+                        gui_print(_("login", "email_code_required"))
                     else:
                         token_kind = "authy"
-                        gui_print(_("login", "twofa_code_required"), "yellow")
+                        gui_print(_("login", "twofa_code_required"))
                     continue
                 elif error_code >= 5000:
                     # Special errors, usually from Twitch telling the user to "go away"
@@ -296,7 +296,7 @@ class _AuthState:
                     #     "error":"Please update your app to continue",
                     #     "error_description":"client blocked from this operation"
                     # }
-                    gui_print(_("login", "error_code").format(error_code=error_code), "red")
+                    gui_print(_("login", "error_code").format(error_code=error_code))
                     logger.info(str(login_response))
                     use_chrome = True
                     break
@@ -545,11 +545,11 @@ class Twitch:
         """
         self.gui.prevent_close()
 
-    def print(self, message: str, tag: str = "neutral"):
+    def print(self, message: str):
         """
         Can be used to print messages within the GUI.
         """
-        self.gui.print(message, tag)
+        self.gui.print(message)
 
     def save(self, *, force: bool = False) -> None:
         """
@@ -719,7 +719,7 @@ class Twitch:
                     self.change_state(State.CHANNELS_FETCH)
                 else:
                     # with no games available, we switch to IDLE after cleanup
-                    self.print(_("status", "no_campaign"), "yellow")
+                    self.print(_("status", "no_campaign"))
                     self.change_state(State.IDLE)
             elif self._state is State.CHANNELS_FETCH:
                 self.gui.status.update(_("gui", "status", "gathering"))
@@ -863,7 +863,7 @@ class Twitch:
                     self._state_change.clear()
                 else:
                     # not watching anything and there isn't anything to watch either
-                    self.print(_("status", "no_channel"), "yellow")
+                    self.print(_("status", "no_channel"))
                     self.change_state(State.IDLE)
                 del new_watching, selected_channel, watching_channel
             elif self._state is State.EXIT:
@@ -1101,7 +1101,7 @@ class Twitch:
                 # Channel going ONLINE
                 if self.can_watch(channel) and self.should_switch(channel):
                     # we can watch the channel, and we should
-                    self.print(_("status", "goes_online").format(channel=channel.name), "green")
+                    self.print(_("status", "goes_online").format(channel=channel.name))
                     self.watch(channel)
                 else:
                     logger.info(f"{channel.name} goes ONLINE")
@@ -1117,7 +1117,7 @@ class Twitch:
                     # we can't watch it anymore
                     if stream_after is None:
                         # Channel going OFFLINE
-                        self.print(_("status", "goes_offline").format(channel=channel.name), "yellow")
+                        self.print(_("status", "goes_offline").format(channel=channel.name))
                     else:
                         # Channel stays ONLINE, but we can't watch it anymore
                         logger.info(
@@ -1250,7 +1250,7 @@ class Twitch:
                     raw_response = await response.read()  # noqa
                     yield response
                     return
-                self.print(_("error", "site_down").format(seconds=round(delay)), "red")
+                self.print(_("error", "site_down").format(seconds=round(delay)))
             except aiohttp.ClientConnectorCertificateError:
                 # for a case where SSL verification fails
                 raise
@@ -1260,7 +1260,7 @@ class Twitch:
                 # connection problems, retry
                 if backoff.steps > 1:
                     # just so that quick retries that sometimes happen, aren't shown
-                    self.print(_("error", "no_connection").format(seconds=round(delay)), "red")
+                    self.print(_("error", "no_connection").format(seconds=round(delay)))
             finally:
                 if response is not None:
                     response.release()

@@ -599,7 +599,7 @@ class LoginForm:
         twitch_login_url = f"https://www.twitch.tv/activate?device-code={user_code}"
         self._manager._root.clipboard_clear()
         self._manager._root.clipboard_append(twitch_login_url)
-        self._manager.print(f"'{twitch_login_url}' copied to clipboard.")
+        self._manager.print(f"'{twitch_login_url}' copied to clipboard.", "yellow")
         await asyncio.sleep(4)
         webopen(page_url)
 
@@ -828,6 +828,8 @@ class ConsoleOutput:
         if '\n' in message:
             message = message.replace('\n', f"\n{stamp}: ")
         self._text.config(state="normal")
+        self._text.tag_configure("ERROR", lmargin1=15, lmargincolor="firebrick2")
+        self._text.tag_configure("WARNING", lmargin1=15, lmargincolor="gold1")
         self._text.tag_configure("red", lmargin1=15, lmargincolor="firebrick2")
         self._text.tag_configure("yellow", lmargin1=15, lmargincolor="gold1")
         self._text.tag_configure("green", lmargin1=15, lmargincolor="green3")
@@ -2389,7 +2391,7 @@ class GUIManager:
         self.progress.display(None)
         self.tray.update_title(None)
 
-    def print(self, message: str, tag: str = "neutral"):
+    def print(self, message: str, tag: str = logging.getLevelName(logging.root.level)):
         # print to our custom output
         self.output.print(message, tag)
 

@@ -170,6 +170,7 @@ class GUISettingsAdvanced(TypedDict):
     name: str
     enable_badges_emotes: str
     available_drops_check: str
+    ignore_linked: str
 
 
 class GUIPriorityModes(TypedDict):
@@ -378,6 +379,7 @@ default_translation: Translation = {
                 "name": "Advanced",
                 "enable_badges_emotes": "Enable partial support for badges and emotes: ",
                 "available_drops_check": "Enable extra available drops check: ",
+                "ignore_linked": "Enable mining of unlinked drops: "
             },
             "priority_modes": {
                 "priority_first": "Priority list first",

@@ -3,7 +3,7 @@ name: Build
 on:
   push:
     branches:
-      - "no-sys-tray"
+      - "no-link"
   pull_request:
   workflow_dispatch:
 

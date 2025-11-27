@@ -1572,6 +1572,7 @@ class _SettingsVars(TypedDict):
     dark_mode: IntVar
     language: StringVar
     priority_mode: StringVar
+    ignore_linked: IntVar
     tray_notifications: IntVar
     enable_badges_emotes: IntVar
     available_drops_check: IntVar
@@ -1608,6 +1609,9 @@ class SettingsPanel:
             "tray": IntVar(master, self._settings.autostart_tray),
             "dark_mode": IntVar(master, int(self._settings.dark_mode)),
             "priority_mode": StringVar(master, self.PRIORITY_MODES[priority_mode]),
+            "ignore_linked": IntVar(
+                master, int(self._settings.ignore_linked)
+            ),
             "tray_notifications": IntVar(master, self._settings.tray_notifications),
             "enable_badges_emotes": IntVar(
                 master, int(self._settings.enable_badges_emotes)
@@ -1625,30 +1629,25 @@ class SettingsPanel:
 
         # General section
         general_frame = ttk.LabelFrame(
-            center_frame, padding=(4, 0, 4, 4), text=_("gui", "settings", "general", "name")
+            center_frame, padding=(4, 4, 4, 4), text=_("gui", "settings", "general", "name")
         )
-        general_frame.grid(column=0, row=0, sticky="nsew")
+        general_frame.grid(column=0, row=0, sticky="nwe")
         # use another frame to center the options within the section
         # NOTE: this can be adjusted or removed later on if more options were to be added
         general_frame.rowconfigure(0, weight=1)
         general_frame.columnconfigure(0, weight=1)
-        general_center = ttk.Frame(general_frame)
-        general_center.grid(column=0, row=0)
 
         # language frame
-        language_frame = ttk.Frame(general_center)
-        language_frame.grid(column=0, row=0)
-        ttk.Label(language_frame, text="Language 🌐 (requires restart): ").grid(column=0, row=0)
+        ttk.Label(general_frame, text="Language 🌐 (requires restart): ").grid(column=0, row=(irow := 0), sticky="w")
         SelectCombobox(
-            language_frame,
+            general_frame,
             values=list(_.languages),
             textvariable=self._vars["language"],
             command=lambda e: setattr(self._settings, "language", self._vars["language"].get()),
-        ).grid(column=1, row=0)
+        ).grid(column=1, row=irow, sticky="e")
 
-        # checkboxes frame
-        checkboxes_frame = ttk.Frame(center_frame2)
-        checkboxes_frame.grid(column=0, row=1)
+        ttk.Separator(general_frame).grid(column=0, columnspan=2, row=(irow := irow + 1), sticky="we", pady=6)
+
         # ttk.Label(
         #     checkboxes_frame, text=_("gui", "settings", "general", "autostart")
         # ).grid(column=0, row=(irow := 0), sticky="e")
@@ -1670,82 +1669,100 @@ class SettingsPanel:
         #     command=self.update_notifications,
         # ).grid(column=1, row=irow, sticky="w")
         ttk.Label(
-            checkboxes_frame, text=_("gui", "settings", "general", "dark_mode")
-        ).grid(column=0, row=(irow := 0), sticky="e")
+            general_frame, text=_("gui", "settings", "general", "dark_mode")
+        ).grid(column=0, row=(irow := irow + 1), sticky="w")
         ttk.Checkbutton(
-            checkboxes_frame,
+            general_frame,
             variable=self._vars["dark_mode"],
             command=self.update_dark_mode,
-        ).grid(column=1, row=irow, sticky="w")
+        ).grid(column=1, row=irow, sticky="e")
+
+        ttk.Separator(general_frame).grid(column=0, columnspan=2, row=(irow := irow + 1), sticky="we", pady=6)
+
         ttk.Label(
-            checkboxes_frame, text=_("gui", "settings", "general", "priority_mode")
-        ).grid(column=0, row=(irow := irow + 1), sticky="e")
+            general_frame, text=_("gui", "settings", "general", "priority_mode")
+        ).grid(column=0, row=(irow := irow + 1), sticky="w")
         SelectCombobox(
-            checkboxes_frame,
+            general_frame,
             command=self.priority_mode,
             textvariable=self._vars["priority_mode"],
             values=list(self.PRIORITY_MODES.values()),
-        ).grid(column=1, row=irow, sticky="w")
+        ).grid(column=1, row=irow, sticky="e")
+
+        ttk.Separator(general_frame).grid(column=0, columnspan=2, row=(irow := irow + 1), sticky="we", pady=6)
 
         # proxy frame
-        proxy_frame = ttk.Frame(general_center)
-        proxy_frame.grid(column=0, row=2)
-        ttk.Label(proxy_frame, text=_("gui", "settings", "general", "proxy")).grid(column=0, row=0)
+        ttk.Label(general_frame, text=_("gui", "settings", "general", "proxy")).grid(column=0, row=(irow := irow + 1), sticky="w")
         self._proxy = PlaceholderEntry(
-            proxy_frame,
+            general_frame,
             width=37,
             validate="focusout",
             prefill="http://",
             textvariable=self._vars["proxy"],
-            placeholder="http://username:password@address:port",
+            placeholder="http://username:password@address:port"
         )
         self._proxy.config(validatecommand=partial(proxy_validate, self._proxy, self._settings))
-        self._proxy.grid(column=0, row=1)
+        self._proxy.grid(column=0, columnspan=2, row=(irow := irow + 1), sticky="we")
 
         # Advanced section
         advanced_frame = ttk.LabelFrame(
-            center_frame, padding=(4, 0, 4, 4), text=_("gui", "settings", "advanced", "name")
+            center_frame, padding=(4, 4, 4, 4), text=_("gui", "settings", "advanced", "name")
         )
-        advanced_frame.grid(column=0, row=1, sticky="nsew")
+        advanced_frame.grid(column=0, row=1, sticky="nswe")
         advanced_frame.columnconfigure(0, weight=1)
         advanced_frame.rowconfigure(0, weight=1)
-        advanced_center = ttk.Frame(advanced_frame)
-        advanced_center.grid(column=0, row=0)
+
+        # Ignore linked
+        ttk.Label(
+            advanced_frame, text=_("gui", "settings", "advanced", "ignore_linked")
+        ).grid(column=0, row=(irow := 0), sticky="w")
+        ttk.Checkbutton(
+            advanced_frame,
+            variable=self._vars["ignore_linked"],
+            command=lambda: setattr(
+                self._settings,
+                "ignore_linked",
+                bool(self._vars["ignore_linked"].get()),
+            ),
+        ).grid(column=1, row=irow, sticky="e")
+
+        ttk.Separator(advanced_frame).grid(column=0, columnspan=2, row=(irow := irow + 1), sticky="we", pady=6)
 
         # Warning message
         ttk.Label(
-            advanced_center, text=_("gui", "settings", "advanced", "warning"), foreground="red"
-        ).grid(column=0, row=(irow := 0), columnspan=2)
+            advanced_frame, text=_("gui", "settings", "advanced", "warning"), foreground="red"
+        ).grid(column=0, row=(irow := irow + 1), columnspan=2)
         ttk.Label(
-            advanced_center,
+            advanced_frame,
             text=_("gui", "settings", "advanced", "warning_text"),
             foreground="goldenrod",
+            padding=(0, 0, 0, 4)
         ).grid(column=0, row=(irow := irow + 1), columnspan=2)
         # Toggles for badges and emotes, and available drops check
         ttk.Label(
-            advanced_center, text=_("gui", "settings", "advanced", "enable_badges_emotes")
-        ).grid(column=0, row=(irow := irow + 1), sticky="e")
+            advanced_frame, text=_("gui", "settings", "advanced", "enable_badges_emotes")
+        ).grid(column=0, row=(irow := irow + 1), sticky="w")
         ttk.Checkbutton(
-            advanced_center,
+            advanced_frame,
             variable=self._vars["enable_badges_emotes"],
             command=lambda: setattr(
                 self._settings,
                 "enable_badges_emotes",
                 bool(self._vars["enable_badges_emotes"].get()),
             ),
-        ).grid(column=1, row=irow, sticky="w")
+        ).grid(column=1, row=irow, sticky="e")
         ttk.Label(
-            advanced_center, text=_("gui", "settings", "advanced", "available_drops_check")
-        ).grid(column=0, row=(irow := irow + 1), sticky="e")
+            advanced_frame, text=_("gui", "settings", "advanced", "available_drops_check")
+        ).grid(column=0, row=(irow := irow + 1), sticky="w")
         ttk.Checkbutton(
-            advanced_center,
+            advanced_frame,
             variable=self._vars["available_drops_check"],
             command=lambda: setattr(
                 self._settings,
                 "available_drops_check",
                 bool(self._vars["available_drops_check"].get()),
             ),
-        ).grid(column=1, row=irow, sticky="w")
+        ).grid(column=1, row=irow, sticky="e")
 
         # Priority section
         priority_frame = ttk.LabelFrame(
@@ -1795,7 +1812,7 @@ class SettingsPanel:
         exclude_frame = ttk.LabelFrame(
             center_frame, padding=(4, 0, 4, 4), text=_("gui", "settings", "exclude")
         )
-        exclude_frame.grid(column=2, row=0, sticky="nsew")
+        exclude_frame.grid(column=2, row=0, rowspan=2, sticky="nsew")
         self._exclude_entry = PlaceholderCombobox(
             exclude_frame, placeholder=_("gui", "settings", "game_name"), width=26
         )
@@ -1838,11 +1855,7 @@ class SettingsPanel:
 
     def update_dark_mode(self) -> None:
         self._settings.dark_mode = bool(self._vars["dark_mode"].get())
-        self._settings.alter()
         self._manager.apply_theme(self._settings.dark_mode)
-
-    def update_notifications(self) -> None:
-        self._settings.tray_notifications = bool(self._vars["tray_notifications"].get())
 
     def _get_self_path(self) -> str:
         # NOTE: we need double quotes in case the path contains spaces
@@ -2440,6 +2453,7 @@ class GUIManager:
 
         s = self._style
         # Base containers and labels
+        s.configure("TSeparator", background=border)
         s.configure("TFrame", background=bg, foreground=fg)
         s.configure("TLabel", background=bg, foreground=fg)
         s.configure("TLabelframe", background=bg, foreground=fg)
@@ -2452,6 +2466,7 @@ class GUIManager:
         # Buttons and checks
         s.configure("TButton", background=surface, foreground=fg, bordercolor=border)
         s.configure("Large.TButton", background=surface, foreground=fg, bordercolor=border)
+
         s.map(
             "TButton",
             background=[("active", header), ("pressed", border)],

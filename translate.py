@@ -168,6 +168,7 @@ class GUISettingsGeneral(TypedDict):
 
 class GUISettingsAdvanced(TypedDict):
     name: str
+    ignore_linked: str
     warning: str
     warning_text: str
     enable_badges_emotes: str
@@ -378,6 +379,7 @@ default_translation: Translation = {
             },
             "advanced": {
                 "name": "Advanced",
+                "ignore_linked": "Enable mining of unlinked drops: ",
                 "warning": "Warning!",
                 "warning_text": (
                     "These options will cause the miner to misbehave.\n"

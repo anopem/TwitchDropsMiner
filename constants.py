@@ -260,9 +260,10 @@ class State(Enum):
 
 
 class PriorityMode(Enum):
-    PRIORITY_ONLY = 0
-    ENDING_SOONEST = 1
-    LOW_AVBL_FIRST = 2
+    PRIORITY_FIRST = 0
+    PRIORITY_ONLY = 1
+    ENDING_SOONEST = 2
+    LOW_AVBL_FIRST = 3
 
 
 class GQLOperation(JsonType):
@@ -387,10 +388,8 @@ GQL_OPERATIONS: dict[str, GQLOperation] = {
         "DirectoryPage_Game",
         "98a996c3c3ebb1ba4fd65d6671c6028d7ee8d615cb540b0731b3db2a911d3649",
         variables={
-            "limit": 30,  # limit of channels returned
-            "slug": ...,  # game slug
             "imageWidth": 50,
-            "includeCostreaming": False,
+            "slug": ...,  # game slug
             "options": {
                 "broadcasterLanguages": [],
                 "freeformTags": None,
@@ -402,6 +401,8 @@ GQL_OPERATIONS: dict[str, GQLOperation] = {
                 "requestID": "JIRA-VXP-2397",
             },
             "sortTypeIsRecency": False,
+            "limit": 30,  # limit of channels returned
+            "includeCostreaming": False,
         },
     ),
     "SlugRedirect": GQLOperation(  # can be used to turn game name -> game slug

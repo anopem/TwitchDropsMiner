@@ -950,7 +950,9 @@ class ChannelList:
                 width = self._measure(width_template)
             else:
                 width = max((self._measure(template) for template in width_template), default=20)
-            self._const_width.add(cid)
+            autosize_columns = ['game']
+            if cid not in autosize_columns:
+                self._const_width.add(cid)
         assert width is not None
         table.heading(cid, text=name, anchor=anchor)
         table.column(cid, minwidth=width, width=width, stretch=False)
@@ -1338,6 +1340,7 @@ class InventoryOverview:
         upcoming = bool(self._filters["upcoming"].get())
         finished = bool(self._filters["finished"].get())
         priority_only = self._settings.priority_mode is PriorityMode.PRIORITY_ONLY
+        priority_first = self._settings.priority_mode is PriorityMode.PRIORITY_FIRST
         if (
             campaign.required_minutes > 0  # don't show sub-only campaigns
             and (not_linked or campaign.eligible)
@@ -1583,6 +1586,7 @@ class SettingsPanel:
         # NOTE: Translation calls have to be deferred here,
         # to allow changing the language before the settings panel is initialized.
         return {
+            PriorityMode.PRIORITY_FIRST: _("gui", "settings", "priority_modes", "priority_first"),
             PriorityMode.PRIORITY_ONLY: _("gui", "settings", "priority_modes", "priority_only"),
             PriorityMode.ENDING_SOONEST: _("gui", "settings", "priority_modes", "ending_soonest"),
             PriorityMode.LOW_AVBL_FIRST: _(
@@ -1643,7 +1647,7 @@ class SettingsPanel:
         ).grid(column=1, row=0)
 
         # checkboxes frame
-        checkboxes_frame = ttk.Frame(general_center)
+        checkboxes_frame = ttk.Frame(center_frame2)
         checkboxes_frame.grid(column=0, row=1)
         # ttk.Label(
         #     checkboxes_frame, text=_("gui", "settings", "general", "autostart")
@@ -1663,11 +1667,8 @@ class SettingsPanel:
         # ttk.Checkbutton(
         #     checkboxes_frame,
         #     variable=self._vars["tray_notifications"],
-        #     command=lambda: setattr(
-        #         self._settings, "tray_notifications", bool(self._vars["tray_notifications"].get())
-        #     ),
+        #     command=self.update_notifications,
         # ).grid(column=1, row=irow, sticky="w")
-
         ttk.Label(
             checkboxes_frame, text=_("gui", "settings", "general", "dark_mode")
         ).grid(column=0, row=(irow := 0), sticky="e")
@@ -1761,7 +1762,7 @@ class SettingsPanel:
         ).grid(column=1, row=0)
         self._priority_list = PaddedListbox(
             priority_frame,
-            height=12,
+            height=10,
             padding=(1, 0),
             activestyle="none",
             selectmode="single",
@@ -1790,12 +1791,11 @@ class SettingsPanel:
             priority_frame, text="❌", command=self.priority_delete, width=3, style="Large.TButton"
         ).grid(column=1, row=3, sticky="ns")
         priority_frame.rowconfigure(3, weight=1)
-
         # Exclude section
         exclude_frame = ttk.LabelFrame(
             center_frame, padding=(4, 0, 4, 4), text=_("gui", "settings", "exclude")
         )
-        exclude_frame.grid(column=2, row=0, rowspan=2, sticky="nsew")
+        exclude_frame.grid(column=2, row=0, sticky="nsew")
         self._exclude_entry = PlaceholderCombobox(
             exclude_frame, placeholder=_("gui", "settings", "game_name"), width=26
         )
@@ -1805,7 +1805,7 @@ class SettingsPanel:
         ).grid(column=1, row=0)
         self._exclude_list = PaddedListbox(
             exclude_frame,
-            height=12,
+            height=10,
             padding=(1, 0),
             activestyle="none",
             selectmode="single",
@@ -1838,7 +1838,11 @@ class SettingsPanel:
 
     def update_dark_mode(self) -> None:
         self._settings.dark_mode = bool(self._vars["dark_mode"].get())
+        self._settings.alter()
         self._manager.apply_theme(self._settings.dark_mode)
+
+    def update_notifications(self) -> None:
+        self._settings.tray_notifications = bool(self._vars["tray_notifications"].get())
 
     def _get_self_path(self) -> str:
         # NOTE: we need double quotes in case the path contains spaces
@@ -2696,7 +2700,7 @@ if __name__ == "__main__":
                 tray=False,
                 priority=[],
                 proxy=URL(),
-                dark_mode=False,
+                dark_mode=True,
                 alter=lambda: None,
                 language="English",
                 autostart_tray=False,

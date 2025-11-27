@@ -175,6 +175,7 @@ class GUISettingsAdvanced(TypedDict):
 
 
 class GUIPriorityModes(TypedDict):
+    priority_first: str
     priority_only: str
     ending_soonest: str
     low_availability: str
@@ -387,6 +388,7 @@ default_translation: Translation = {
                 "available_drops_check": "Enable extra available drops check: ",
             },
             "priority_modes": {
+                "priority_first": "Priority list first",
                 "priority_only": "Priority list only",
                 "ending_soonest": "Ending soonest",
                 "low_availability": "Low availability first",

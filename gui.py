@@ -891,7 +891,7 @@ class ChannelList:
         scroll.grid(column=1, row=1, sticky="ns")
         self._font = Font(frame, manager._style.lookup("Treeview", "font"))
         self._const_width: set[str] = set()
-        table.tag_configure("watching", background="gray70")
+        table.tag_configure("watching", background="DodgerBlue1")
         table.bind("<Button-1>", self._disable_column_resize)
         table.bind("<<TreeviewSelect>>", self._selected)
         self._add_column("#0", '', width=0)

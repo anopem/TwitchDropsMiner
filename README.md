@@ -64,5 +64,6 @@ Every several seconds, the application pretends to watch a particular stream by 
 @kilroy98 - For the Russian (Русский) translation corrections and revisions.  
 @Shofuu - For the entirety of the Spanish (Español) translation and revisions.  
 @alikdb - For the entirety of the Turkish (Türkçe) translation.  
+@DogancanYr - For the Turkish (Türkçe) translation revisions.  
 @Nollasko - For the entirety of the Ukrainian (Українська) translation and revisions.  
 @kilroy98 - For the Ukrainian (Українська) translation corrections and revisions.  

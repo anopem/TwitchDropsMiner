@@ -1,8 +1,15 @@
+<div align="center">
+
+![Twitch Drops Miner Icon](https://raw.githubusercontent.com/DevilXD/TwitchDropsMiner/master/appimage/pickaxe.png)
+
 # Twitch Drops Miner (for Docker)
 
-This application allows you to AFK mine timed Twitch drops, without having to worry about switching channels when the one you were watching goes offline, claiming the drops, or even receiving the stream data itself. This helps you save on bandwidth and hassle. This is a fork of [fireph](https://github.com/fireph/docker-twitch-drops-miner). 
+This application allows you to AFK mine timed Twitch drops, without having to worry about switching channels when the one you were watching goes offline, claiming the drops, or even receiving the stream data itself. This helps you save on bandwidth and hassle. 
 
-This fork brings some quality of life features that i personally felt missing.
+This is a fork of [fireph](https://github.com/fireph/docker-twitch-drops-miner)'s version, that brings some quality of life features that i personally felt missing.
+
+[![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/anopem/TwitchDropsMiner/ci.yml?style=for-the-badge&logo=python&logoColor=white)](https://github.com/anopem/TwitchDropsMiner/actions/workflows/ci.yml) [![GitHub](https://img.shields.io/badge/GitHub-Repository-blue?style=for-the-badge&logo=github)](https://github.com/anopem/docker-twitch-drops-miner)
+</div>
 
 ### Docker Fork Modifications:
 This fork has been specifically modified for Docker deployment with the following key changes:

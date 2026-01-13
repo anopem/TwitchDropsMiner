@@ -451,7 +451,7 @@ class _WSEntry(TypedDict):
 class WebsocketStatus:
     def __init__(self, manager: GUIManager, master: ttk.Widget):
         frame = ttk.LabelFrame(master, text=_("gui", "websocket", "name"), padding=(4, 0, 4, 4))
-        frame.grid(column=0, row=1, sticky="nsew", padx=2)
+        frame.grid(column=0, row=1, sticky="nsew", padx=4, pady=(8,0))
         self._status_var = StringVar(frame)
         self._topics_var = StringVar(frame)
         ttk.Label(
@@ -524,7 +524,7 @@ class LoginForm:
         self._manager = manager
         self._var = StringVar(master)
         frame = ttk.LabelFrame(master, text=_("gui", "login", "name"), padding=(4, 0, 4, 4))
-        frame.grid(column=1, row=1, sticky="nsew", padx=2)
+        frame.grid(column=1, row=1, sticky="nsew", padx=4, pady=(8,0))
         frame.columnconfigure(0, weight=2)
         frame.columnconfigure(1, weight=1)
         frame.rowconfigure(4, weight=1)
@@ -656,7 +656,7 @@ class CampaignProgress:
         self._frame = frame = ttk.LabelFrame(
             master, text=_("gui", "progress", "name"), padding=(4, 0, 4, 4)
         )
-        frame.grid(column=0, row=2, columnspan=2, sticky="nsew", padx=2)
+        frame.grid(column=0, row=2, columnspan=2, sticky="nsew", padx=4, pady=(8,0))
         frame.columnconfigure(0, weight=2)
         frame.columnconfigure(1, weight=1)
         game_campaign = ttk.Frame(frame)
@@ -800,7 +800,7 @@ class CampaignProgress:
 class ConsoleOutput:
     def __init__(self, manager: GUIManager, master: ttk.Widget):
         frame = ttk.LabelFrame(master, text=_("gui", "output"), padding=(4, 0, 4, 4))
-        frame.grid(column=0, row=3, columnspan=3, sticky="nsew", padx=2)
+        frame.grid(column=0, row=3, columnspan=3, sticky="nsew", padx=4, pady=(8,0))
         # tell master frame that the containing row can expand
         master.rowconfigure(3, weight=1)
         frame.rowconfigure(0, weight=1)  # let the frame expand
@@ -864,7 +864,7 @@ class ChannelList:
     def __init__(self, manager: GUIManager, master: ttk.Widget):
         self._manager = manager
         frame = ttk.LabelFrame(master, text=_("gui", "channels", "name"), padding=(4, 0, 4, 4))
-        frame.grid(column=2, row=1, rowspan=2, sticky="nsew", padx=2)
+        frame.grid(column=2, row=1, rowspan=2, sticky="nsew", padx=4, pady=(8,0))
         # tell master frame that the containing column can expand
         master.columnconfigure(2, weight=1)
         frame.rowconfigure(1, weight=1)
@@ -1257,7 +1257,7 @@ class InventoryOverview:
         manager.tabs.add_view_event(self._on_tab_switched)
         # Filtering options
         filter_frame = ttk.LabelFrame(
-            master, text=_("gui", "inventory", "filter", "name"), padding=(4, 0, 4, 4)
+            master, text=_("gui", "inventory", "filter", "name"), padding=4
         )
         LABEL_SPACING = 20
         filter_frame.grid(column=0, row=0, columnspan=2, sticky="nsew")
@@ -1310,7 +1310,7 @@ class InventoryOverview:
         ).grid(column=(icolumn := icolumn + 1), row=0)
         # Inventory view
         self._canvas = tk.Canvas(master, scrollregion=(0, 0, 0, 0))
-        self._canvas.grid(column=0, row=1, sticky="nsew")
+        self._canvas.grid(column=0, row=1, sticky="nsew", pady=(8,0))
         master.rowconfigure(1, weight=1)
         master.columnconfigure(0, weight=1)
         xscroll = ttk.Scrollbar(master, orient="horizontal", command=self._canvas.xview)
@@ -1400,7 +1400,7 @@ class InventoryOverview:
 
     async def add_campaign(self, campaign: DropsCampaign) -> None:
         campaign_frame = ttk.Frame(self._main_frame, relief="ridge", borderwidth=1, padding=4)
-        campaign_frame.grid(column=0, row=len(self._campaigns), sticky="nsew", pady=3)
+        campaign_frame.grid(column=0, row=len(self._campaigns), sticky="nsew", pady=5, padx=5)
         campaign_frame.rowconfigure(4, weight=1)
         campaign_frame.columnconfigure(1, weight=1)
         campaign_frame.columnconfigure(3, weight=10000)
@@ -1623,16 +1623,18 @@ class SettingsPanel:
         }
         self._game_names: set[str] = set()
         master.rowconfigure(0, weight=1)
+        #master.rowconfigure(1, weight=1)
         master.columnconfigure(0, weight=1)
         # use a frame to center the content within the tab
         center_frame = ttk.Frame(master)
         center_frame.grid(column=0, row=0)
+        #center_frame = master
 
         # General section
         general_frame = ttk.LabelFrame(
             center_frame, padding=(4, 4, 4, 4), text=_("gui", "settings", "general", "name")
         )
-        general_frame.grid(column=0, row=0, sticky="nwe")
+        general_frame.grid(column=0, row=0, sticky="nswe", padx=(0, 8))
         # use another frame to center the options within the section
         # NOTE: this can be adjusted or removed later on if more options were to be added
         general_frame.rowconfigure(0, weight=1)
@@ -1709,7 +1711,7 @@ class SettingsPanel:
         advanced_frame = ttk.LabelFrame(
             center_frame, padding=(4, 4, 4, 4), text=_("gui", "settings", "advanced", "name")
         )
-        advanced_frame.grid(column=0, row=1, sticky="nswe")
+        advanced_frame.grid(column=0, row=1, sticky="nsew", pady=(8, 0), padx=(0, 8))
         advanced_frame.columnconfigure(0, weight=1)
         advanced_frame.rowconfigure(0, weight=1)
 
@@ -1767,13 +1769,13 @@ class SettingsPanel:
 
         # Priority section
         priority_frame = ttk.LabelFrame(
-            center_frame, padding=(4, 0, 4, 4), text=_("gui", "settings", "priority")
+            center_frame, text=_("gui", "settings", "priority")
         )
-        priority_frame.grid(column=1, row=0, rowspan=2, sticky="nsew")
+        priority_frame.grid(column=1, row=0, rowspan=2, sticky="nsew", padx=(0, 8))
         self._priority_entry = PlaceholderCombobox(
             priority_frame, placeholder=_("gui", "settings", "game_name"), width=30
         )
-        self._priority_entry.grid(column=0, row=0, sticky="ew")
+        self._priority_entry.grid(column=0, row=0, sticky="nsew")
         priority_frame.columnconfigure(0, weight=1)
         ttk.Button(
             priority_frame, text="➕", command=self.priority_add, width=3, style="Large.TButton"
@@ -1781,7 +1783,8 @@ class SettingsPanel:
         self._priority_list = PaddedListbox(
             priority_frame,
             height=10,
-            padding=(1, 0),
+            padding=(0, 1, 1, 0),
+            borderwidth=0,
             activestyle="none",
             selectmode="single",
             highlightthickness=0,
@@ -1829,20 +1832,21 @@ class SettingsPanel:
 
         # Exclude section
         exclude_frame = ttk.LabelFrame(
-            center_frame, padding=(4, 0, 4, 4), text=_("gui", "settings", "exclude")
+            center_frame, text=_("gui", "settings", "exclude")
         )
         exclude_frame.grid(column=2, row=0, rowspan=2, sticky="nsew")
         self._exclude_entry = PlaceholderCombobox(
             exclude_frame, placeholder=_("gui", "settings", "game_name"), width=26
         )
-        self._exclude_entry.grid(column=0, row=0, sticky="ew")
+        self._exclude_entry.grid(column=0, row=0, sticky="nsew")
         ttk.Button(
             exclude_frame, text="➕", command=self.exclude_add, width=3, style="Large.TButton"
         ).grid(column=1, row=0)
         self._exclude_list = PaddedListbox(
             exclude_frame,
             height=10,
-            padding=(1, 0),
+            padding=(0, 0, 1, 1),
+            borderwidth=0,
             activestyle="none",
             selectmode="single",
             highlightthickness=0,
@@ -1858,7 +1862,7 @@ class SettingsPanel:
 
         # Reload button
         reload_frame = ttk.Frame(center_frame)
-        reload_frame.grid(column=0, row=2, columnspan=3, pady=4)
+        reload_frame.grid(column=0, row=2, columnspan=3, pady=(8, 4))
         ttk.Label(reload_frame, text=_("gui", "settings", "reload_text")).grid(column=0, row=0)
         ttk.Button(
             reload_frame,
@@ -2095,7 +2099,7 @@ class HelpTab:
         irow = 0
         # About
         about = ttk.LabelFrame(center_frame, padding=(4, 0, 4, 4), text="About")
-        about.grid(column=0, row=(irow := irow + 1), sticky="nsew", padx=2)
+        about.grid(column=0, row=(irow := irow + 1), sticky="nsew", padx=4, pady=(8,0))
         about.columnconfigure(2, weight=1)
         # About - created by
         ttk.Label(
@@ -2129,7 +2133,7 @@ class HelpTab:
         links = ttk.LabelFrame(
             center_frame, padding=(4, 0, 4, 4), text=_("gui", "help", "links", "name")
         )
-        links.grid(column=0, row=(irow := irow + 1), sticky="nsew", padx=2)
+        links.grid(column=0, row=(irow := irow + 1), sticky="nsew", padx=4, pady=(8,0))
         LinkLabel(
             links,
             link="https://www.twitch.tv/drops/inventory",
@@ -2144,14 +2148,14 @@ class HelpTab:
         howitworks = ttk.LabelFrame(
             center_frame, padding=(4, 0, 4, 4), text=_("gui", "help", "how_it_works")
         )
-        howitworks.grid(column=0, row=(irow := irow + 1), sticky="nsew", padx=2)
+        howitworks.grid(column=0, row=(irow := irow + 1), sticky="nsew", padx=4, pady=(8,0))
         ttk.Label(
             howitworks, text=_("gui", "help", "how_it_works_text"), wraplength=self.WIDTH
         ).grid(sticky="nsew")
         getstarted = ttk.LabelFrame(
             center_frame, padding=(4, 0, 4, 4), text=_("gui", "help", "getting_started")
         )
-        getstarted.grid(column=0, row=(irow := irow + 1), sticky="nsew", padx=2)
+        getstarted.grid(column=0, row=(irow := irow + 1), sticky="nsew", padx=4, pady=(8,0))
         ttk.Label(
             getstarted, text=_("gui", "help", "getting_started_text"), wraplength=self.WIDTH
         ).grid(sticky="nsew")
@@ -2560,7 +2564,7 @@ class GUIManager:
         )
         s.configure("Treeview.Heading", background=header, foreground=fg, bordercolor=border)
         # Progressbar
-        s.configure("TProgressbar", background=accent, troughcolor=surface)
+        s.configure("TProgressbar", background=accent, troughcolor=surface, lightcolor=accent, darkcolor=accent)
         # Scrollbars
         s.configure(
             "Vertical.TScrollbar",

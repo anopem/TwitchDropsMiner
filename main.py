@@ -210,10 +210,6 @@ if __name__ == "__main__":
             # already running - exit
             sys.exit(3)
 
-        try:
-            asyncio.run(main())
-        except KeyboardInterrupt:
-            # Handle Ctrl-C gracefully
-            sys.exit(0)
+        asyncio.run(main())
     finally:
         file.close()

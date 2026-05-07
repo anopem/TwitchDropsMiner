@@ -24,7 +24,3 @@ cookies.jar
 /appimage-build
 /*.AppImage
 /*.AppImage.zsync
-.DS_Store
-*.app
-
-/config

@@ -956,7 +956,10 @@ class ChannelList:
                 width = self._measure(width_template)
             else:
                 width = max((self._measure(template) for template in width_template), default=20)
-            self._const_width.add(cid)
+            #self._const_width.add(cid)
+            autosize_columns = ['game']
+            if cid not in autosize_columns:
+                self._const_width.add(cid)
         assert width is not None
         table.heading(cid, text=name, anchor=anchor)
         table.column(cid, minwidth=width, width=width, stretch=False)
@@ -1349,6 +1352,7 @@ class InventoryOverview:
         upcoming = bool(self._filters["upcoming"].get())
         finished = bool(self._filters["finished"].get())
         priority_only = self._settings.priority_mode is PriorityMode.PRIORITY_ONLY
+        priority_first = self._settings.priority_mode is PriorityMode.PRIORITY_FIRST
         if (
             campaign.required_minutes > 0  # don't show sub-only campaigns
             and (not_linked or campaign.eligible)
@@ -1580,6 +1584,7 @@ class _SettingsVars(TypedDict):
     dark_mode: IntVar
     language: StringVar
     priority_mode: StringVar
+    ignore_linked: IntVar
     tray_notifications: IntVar
     enable_badges_emotes: IntVar
     available_drops_check: IntVar
@@ -1594,6 +1599,7 @@ class SettingsPanel:
         # NOTE: Translation calls have to be deferred here,
         # to allow changing the language before the settings panel is initialized.
         return {
+            PriorityMode.PRIORITY_FIRST: _("gui", "settings", "priority_modes", "priority_first"),
             PriorityMode.PRIORITY_ONLY: _("gui", "settings", "priority_modes", "priority_only"),
             PriorityMode.ENDING_SOONEST: _("gui", "settings", "priority_modes", "ending_soonest"),
             PriorityMode.LOW_AVBL_FIRST: _(
@@ -1615,6 +1621,9 @@ class SettingsPanel:
             "tray": IntVar(master, self._settings.autostart_tray),
             "dark_mode": IntVar(master, int(self._settings.dark_mode)),
             "priority_mode": StringVar(master, self.PRIORITY_MODES[priority_mode]),
+            "ignore_linked": IntVar(
+                master, int(self._settings.ignore_linked)
+            ),
             "tray_notifications": IntVar(master, self._settings.tray_notifications),
             "enable_badges_emotes": IntVar(
                 master, int(self._settings.enable_badges_emotes)
@@ -1723,6 +1732,20 @@ class SettingsPanel:
         advanced_frame.rowconfigure(0, weight=1)
         advanced_center = ttk.Frame(advanced_frame)
         advanced_center.grid(column=0, row=0)
+
+        # Ignore linked
+        ttk.Label(
+            advanced_frame, text=_("gui", "settings", "advanced", "ignore_linked")
+        ).grid(column=0, row=(irow := 0), sticky="w")
+        ttk.Checkbutton(
+            advanced_frame,
+            variable=self._vars["ignore_linked"],
+            command=lambda: setattr(
+                self._settings,
+                "ignore_linked",
+                bool(self._vars["ignore_linked"].get()),
+            ),
+        ).grid(column=1, row=(irow := irow + 1), sticky="e")
 
         # Warning message
         ttk.Label(
@@ -2811,7 +2834,7 @@ if __name__ == "__main__":
                 enable_badges_emotes=False,
                 available_drops_check=False,
                 logging_level=LOGGING_LEVELS[0],
-                priority_mode=PriorityMode.PRIORITY_ONLY,
+                priority_mode=PriorityMode.PRIORITY_FIRST,
             )
         )
         mock.change_state = lambda state: mock.gui.print(f"State change: {state.value}")

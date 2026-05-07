@@ -123,6 +123,17 @@ class GeneralSection:
                         ),
                     ).bind_value_from(settings, "available_drops_check")
 
+                with ui.row().classes("items-center gap-2 text-xs"):
+                    ui.label(
+                        _("gui", "settings", "advanced", "ignore_linked")
+                    ).classes("flex-1")
+                    ui.switch(
+                        value=settings.ignore_linked,
+                        on_change=lambda e: GeneralSection._set_and_save(
+                            settings, "ignore_linked", e.value
+                        ),
+                    ).bind_value_from(settings, "ignore_linked")
+
             with ui.card().props("flat bordered").classes("w-full q-pa-sm"):
                 ui.label(_("gui", "settings", "reload_text")).classes("text-xs")
                 ui.button(
@@ -178,6 +189,9 @@ class GeneralSection:
     @staticmethod
     def _priority_mode_options() -> dict:
         return {
+            PriorityMode.PRIORITY_FIRST: _(
+                "gui", "settings", "priority_modes", "priority_first"
+            ),
             PriorityMode.PRIORITY_ONLY: _(
                 "gui", "settings", "priority_modes", "priority_only"
             ),

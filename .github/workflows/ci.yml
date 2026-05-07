@@ -3,7 +3,7 @@ name: Build
 on:
   push:
     branches:
-      - "no-link"
+      - "webui"
   pull_request:
   workflow_dispatch:
 
@@ -106,6 +106,59 @@ jobs:
           if-no-files-found: error
           name: Twitch.Drops.Miner.Windows
           path: Twitch.Drops.Miner.Windows.zip
+
+  macos:
+    if: false
+    name: macOS
+    runs-on: macos-latest
+    needs:
+      - validate
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up variables
+        id: vars
+        run: |
+          echo "sha_short=$(git rev-parse --short HEAD)" >> "$GITHUB_OUTPUT"
+
+      - name: Append git revision to project version
+        run: |
+          sed -i '' -E "s/^(__version__\s*=\s*\"[^\"]+)/\1.${{steps.vars.outputs.sha_short}}/" version.py
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{env.PYTHON_VERSION}}
+
+      - name: Install project dependencies
+        run: |
+          python3 -m pip install wheel
+          python3 -m pip install -r requirements.txt
+
+      - name: Install PyInstaller
+        run: |
+          python3 -m pip install pyinstaller
+
+      - name: Create portable executable
+        run: |
+          pyinstaller build.spec --noconfirm
+
+      - name: Create release folder and Zip
+        run: |
+          FOLDER="Twitch Drops Miner"
+          mkdir -p "$FOLDER"
+          cp -r "dist/Twitch Drops Miner (by DevilXD).app" "$FOLDER/"
+          cp manual.txt "$FOLDER/"
+          zip -r Twitch.Drops.Miner.MacOS.zip "$FOLDER"
+
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          if-no-files-found: error
+          name: Twitch.Drops.Miner.MacOS
+          path: Twitch.Drops.Miner.MacOS.zip
 
   linux-pyinstaller:
     if: false
@@ -247,8 +300,8 @@ jobs:
           name: Twitch.Drops.Miner.Linux.AppImage-${{matrix.arch}}
           path: Twitch.Drops.Miner.Linux.AppImage-${{matrix.arch}}.zip
 
-  linux-pyinstaller-musl:
-    name: Linux (PyInstaller musl) (${{matrix.arch}})
+  linux-pyinstaller-musl-tkinter:
+    name: PyInstaller-tkinter (${{matrix.arch}})
     strategy:
       fail-fast: false
       matrix:
@@ -259,22 +312,13 @@ jobs:
           - arch: aarch64
             platform: arm64
             runner: ubuntu-24.04-arm
-          - arch: i386
-            platform: 386
-            runner: ubuntu-24.04
-          - arch: armv7
-            platform: arm/v7
-            runner: ubuntu-24.04-arm
-          - arch: armv6
-            platform: arm/v6
-            runner: ubuntu-24.04-arm
     runs-on: ${{matrix.runner}}
     needs:
       - validate
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Set up variables
         id: vars
@@ -286,27 +330,79 @@ jobs:
           sed -ri "s/^__version__\s*=\s*\"[^\"]+/\0.${{steps.vars.outputs.sha_short}}/" version.py
 
       - name: Set up QEMU
-        uses: docker/setup-qemu-action@v3
+        uses: docker/setup-qemu-action@v4
 
       - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
+        uses: docker/setup-buildx-action@v4
 
-      - name: Build with Docker
+      - name: Build tkinter version
         run: |
-          docker build -f Dockerfile.alpine --platform linux/${{matrix.platform}} --build-arg ARCH=${{matrix.arch}} -t twitch-drops-miner-alpine:${{matrix.arch}} .
+          docker build -f Dockerfile.alpine --platform linux/${{matrix.platform}} --build-arg ARCH=${{matrix.arch}} --build-arg UI_BACKEND=tkinter -t twitch-drops-miner-tkinter:${{matrix.arch}} .
 
-      - name: Extract build artifacts
+      - name: Extract tkinter build artifacts
         run: |
-          docker create --name extract twitch-drops-miner-alpine:${{matrix.arch}}
-          docker cp extract:/app/Twitch.Drops.Miner.Linux.musl.PyInstaller-${{matrix.arch}}.zip .
-          docker rm extract
+          docker create --name extract-tkinter twitch-drops-miner-tkinter:${{matrix.arch}}
+          docker cp extract-tkinter:/app/Twitch.Drops.Miner.Linux.musl.PyInstaller-tkinter-${{matrix.arch}}.zip .
+          docker rm extract-tkinter
 
-      - name: Upload build artifact
-        uses: actions/upload-artifact@v4
+      - name: Upload tkinter build artifact
+        uses: actions/upload-artifact@v7
         with:
           if-no-files-found: error
-          name: Twitch.Drops.Miner.Linux.musl.PyInstaller-${{matrix.arch}}
-          path: Twitch.Drops.Miner.Linux.musl.PyInstaller-${{matrix.arch}}.zip
+          name: Twitch.Drops.Miner.Linux.musl.PyInstaller-tkinter-${{matrix.arch}}
+          path: Twitch.Drops.Miner.Linux.musl.PyInstaller-tkinter-${{matrix.arch}}.zip
+
+  linux-pyinstaller-musl-nicegui:
+    name: PyInstaller-nicegui (${{matrix.arch}})
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - arch: x86_64
+            platform: amd64
+            runner: ubuntu-24.04
+          - arch: aarch64
+            platform: arm64
+            runner: ubuntu-24.04-arm
+    runs-on: ${{matrix.runner}}
+    needs:
+      - validate
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
+
+      - name: Set up variables
+        id: vars
+        run: |
+          echo "sha_short=$(git rev-parse --short HEAD)" >> "${GITHUB_OUTPUT}"
+
+      - name: Append git revision to project version
+        run: |
+          sed -ri "s/^__version__\s*=\s*\"[^\"]+/\0.${{steps.vars.outputs.sha_short}}/" version.py
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v4
+
+      - name: Build nicegui version
+        run: |
+          docker build -f Dockerfile.alpine --platform linux/${{matrix.platform}} --build-arg ARCH=${{matrix.arch}} --build-arg UI_BACKEND=nicegui -t twitch-drops-miner-nicegui:${{matrix.arch}} .
+
+      - name: Extract nicegui build artifacts
+        run: |
+          docker create --name extract-nicegui twitch-drops-miner-nicegui:${{matrix.arch}}
+          docker cp extract-nicegui:/app/Twitch.Drops.Miner.Linux.musl.PyInstaller-nicegui-${{matrix.arch}}.zip .
+          docker rm extract-nicegui
+
+      - name: Upload nicegui build artifact
+        uses: actions/upload-artifact@v7
+        with:
+          if-no-files-found: error
+          name: Twitch.Drops.Miner.Linux.musl.PyInstaller-nicegui-${{matrix.arch}}
+          path: Twitch.Drops.Miner.Linux.musl.PyInstaller-nicegui-${{matrix.arch}}.zip
 
   update_releases_page:
     name: Upload builds to Releases
@@ -315,7 +411,9 @@ jobs:
       # - windows
       # - linux-pyinstaller
       # - linux-appimage
-      - linux-pyinstaller-musl
+      # - macos
+      - linux-pyinstaller-musl-tkinter
+      - linux-pyinstaller-musl-nicegui
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -327,7 +425,7 @@ jobs:
           echo "date_now=$(date --rfc-3339=seconds)" >> "${GITHUB_OUTPUT}"
 
       - name: Download build artifacts from previous jobs
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           path: artifacts
 

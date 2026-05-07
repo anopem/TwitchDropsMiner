@@ -178,9 +178,6 @@ class GeneralSection:
     @staticmethod
     def _priority_mode_options() -> dict:
         return {
-            PriorityMode.PRIORITY_FIRST: _(
-                "gui", "settings", "priority_modes", "priority_first"
-            ),
             PriorityMode.PRIORITY_ONLY: _(
                 "gui", "settings", "priority_modes", "priority_only"
             ),

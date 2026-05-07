@@ -201,7 +201,6 @@ if __name__ == "__main__":
         client.gui.close_window()
         sys.exit(exit_status)
 
-    file = None
     try:
         # use lock_file to check if we're not already running
         success, file = lock_file(LOCK_PATH)

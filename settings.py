@@ -20,7 +20,6 @@ class SettingsFile(TypedDict):
     autostart_tray: bool
     connection_quality: int
     tray_notifications: bool
-    ignore_linked: bool
     enable_badges_emotes: bool
     available_drops_check: bool
     priority_mode: PriorityMode
@@ -30,15 +29,14 @@ default_settings: SettingsFile = {
     "proxy": URL(),
     "priority": [],
     "exclude": set(),
-    "dark_mode": True,
+    "dark_mode": False,
     "autostart_tray": False,
     "connection_quality": 1,
     "language": DEFAULT_LANG,
     "tray_notifications": True,
-    "ignore_linked": False,
     "enable_badges_emotes": False,
     "available_drops_check": False,
-    "priority_mode": PriorityMode.PRIORITY_FIRST,
+    "priority_mode": PriorityMode.PRIORITY_ONLY,
 }
 
 
@@ -61,7 +59,6 @@ class Settings:
     autostart_tray: bool
     connection_quality: int
     tray_notifications: bool
-    ignore_linked: bool
     enable_badges_emotes: bool
     available_drops_check: bool
     priority_mode: PriorityMode

@@ -1,22 +1,12 @@
-<div align="center">
-
-![Twitch Drops Miner Icon](https://raw.githubusercontent.com/DevilXD/TwitchDropsMiner/master/appimage/pickaxe.png)
-
 # Twitch Drops Miner (for Docker)
 
-This application allows you to AFK mine timed Twitch drops, without having to worry about switching channels when the one you were watching goes offline, claiming the drops, or even receiving the stream data itself. This helps you save on bandwidth and hassle. 
-
-This is a fork of [fireph](https://github.com/fireph/docker-twitch-drops-miner)'s version, that brings some quality of life features that i personally felt missing.
-
-[![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/anopem/TwitchDropsMiner/ci.yml?style=for-the-badge&logo=python&logoColor=white)](https://github.com/anopem/TwitchDropsMiner/actions/workflows/ci.yml) [![GitHub](https://img.shields.io/badge/GitHub-Repository-blue?style=for-the-badge&logo=github)](https://github.com/anopem/docker-twitch-drops-miner)
-</div>
+This application allows you to AFK mine timed Twitch drops, without having to worry about switching channels when the one you were watching goes offline, claiming the drops, or even receiving the stream data itself. This helps you save on bandwidth and hassle. This is a fork of https://github.com/DevilXD/TwitchDropsMiner meant to be run inside Docker.
 
 ### Docker Fork Modifications:
 This fork has been specifically modified for Docker deployment with the following key changes:
 - **System tray removed** - All system tray functionality has been disabled and runtime dependencies removed
 - **Console logging** - Added `--stdlog` command line option to output logs to stdout/stderr
 - **Streamlined settings** - Moved settings into ./config folder
-- **AppImage only** - Build process modified to only generate Linux AppImage builds
 - **Automated upstream sync** - Workflow to automatically merge updates from the upstream repository
 - **Enhanced error handling** - Improved error messages when settings files can't be loaded
 - **Login URL management** - Login URLs are copied to clipboard
@@ -121,10 +111,56 @@ If you like the application and found it useful, please consider donating a smal
 
 </div>
 
+### Project goals:
 
-@DevilXD - Creating the miner and maintaining it.
+Twitch Drops Miner (TDM for short) has been designed with a couple of simple goals in mind. These are, specifically:
 
-@fireph - Converting the original application to docker.
+- Twitch Drops oriented - it's in the name. That's what I made it for.
+- Easy to use for an average person. Includes a nice looking GUI and is packaged as a ready-to-go executable, without requiring an existing Python installation to work.
+- Intended as a helper tool that starts together with your PC, runs in the background through out the day, and then closes together with your PC shutting down at the end of the day. If it can run continuously for 24 hours at minimum, and not run into any errors, I'd call that good enough already.
+- Requiring a minimum amount of attention during operation - check it once or twice through out the day to see if everything's fine with it.
+- Underlying service friendly - the amount of interactions done with the Twitch site is kept to the minimum required for reliable operation, at a level achievable by a diligent site user.
+
+TDM is not intended for/as:
+
+- Mining channel points - again, it's about the drops: only.
+- Mining anything else besides Twitch drops - no, I won't be adding support for a random 3rd party site that also happens to rely on watching Twitch streams.
+- Unattended operation: worst case scenario, it'll stop working and you'll hopefully notice that at some point. Hopefully.
+- 100% uptime application, due to the underlying nature of it, expect fatal errors to happen every so often.
+- Being hosted on a remote server as a 24/7 miner.
+- Being used with more than one managed account.
+- Mining campaigns the managed account isn't linked to.
+
+This means that features such as:
+
+- It being possible to run it without a GUI, or with only a console attached.
+- Any form of automatic restart when an error happens.
+- Docker or any other form of remote deployment.
+- Using it with more than one managed account.
+- Making it possible to mine campaigns that the managed account isn't linked to.
+- Anything that increases the site processing load caused by the application.
+- Any form of additional notifications system (email, webhook, etc.), beyond what's already implemented.
+
+..., are most likely not going to be a feature, ever. You're welcome to search through the existing issues to comment on your point of view on the relevant matters, where applicable. Otherwise, most of the new issues that go against these goals will be closed and the user will be pointed to this paragraph.
+
+For more context about these goals, please check out these issues: [#161](https://github.com/DevilXD/TwitchDropsMiner/issues/161), [#105](https://github.com/DevilXD/TwitchDropsMiner/issues/105), [#84](https://github.com/DevilXD/TwitchDropsMiner/issues/84)
+
+### Credits:
+
+<!---
+Note: The translations credits are sorted alphabetically, based on their English language name.
+When adding a new entry, please ensure to insert it in the correct place in the second section.
+Non-translations related credits should be added to the first section instead.
+
+Note: When adding a new credits line below, please add two trailing spaces at the end
+of the previous line, if they aren't already there. Doing so ensures proper markdown
+rendering on Github. In short: Each credits line should end with two trailing spaces,
+placed past the period character at the end.
+
+• Last line can have the two trailing spaces omitted.
+• Please ensure your editor won't trim the trailing spaces upon saving the file.
+• Please ensure to leave a single empty new line at the end of the file.
+-->
 
 @guihkx - For the CI script, CI maintenance, and everything related to Linux builds.  
 @kWAYTV - For the implementation of the dark mode theme.  

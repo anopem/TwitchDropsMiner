@@ -672,7 +672,7 @@ class Twitch:
                         game not in self.wanted_games  # isn't already there
                         # and isn't excluded by list or priority mode
                         and game.name not in exclude
-                        and (not priority_only)
+                        and (not priority_only or game.name in priority)
                         # and can be progressed within the next hour
                         and campaign.can_earn_within(next_hour)
                     ):
@@ -1570,7 +1570,7 @@ class Twitch:
     async def bulk_check_online(self, channels: abc.Iterable[Channel]):
         """
         Utilize batch GQL requests to check ONLINE status for a lot of channels at once.
-        Also handles the drops_enabled check.
+        Also handles the drops_enabled check (if enabled).
         """
         acl_streams_map: dict[int, JsonType] = {}
         stream_gql_ops: list[GQLOperation] = [channel.stream_gql for channel in channels]

@@ -897,7 +897,7 @@ class ChannelList:
         scroll.grid(column=1, row=1, sticky="ns")
         self._font = Font(frame, manager._style.lookup("Treeview", "font"))
         self._const_width: set[str] = set()
-        table.tag_configure("watching", background="DodgerBlue1")
+        table.tag_configure("watching", background="gray70")
         table.bind("<Button-1>", self._disable_column_resize)
         table.bind("<<TreeviewSelect>>", self._selected)
         self._add_column("#0", '', width=0)
@@ -1349,7 +1349,6 @@ class InventoryOverview:
         upcoming = bool(self._filters["upcoming"].get())
         finished = bool(self._filters["finished"].get())
         priority_only = self._settings.priority_mode is PriorityMode.PRIORITY_ONLY
-        priority_first = self._settings.priority_mode is PriorityMode.PRIORITY_FIRST
         if (
             campaign.required_minutes > 0  # don't show sub-only campaigns
             and (not_linked or campaign.eligible)
@@ -1581,7 +1580,6 @@ class _SettingsVars(TypedDict):
     dark_mode: IntVar
     language: StringVar
     priority_mode: StringVar
-    ignore_linked: IntVar
     tray_notifications: IntVar
     enable_badges_emotes: IntVar
     available_drops_check: IntVar
@@ -1596,7 +1594,6 @@ class SettingsPanel:
         # NOTE: Translation calls have to be deferred here,
         # to allow changing the language before the settings panel is initialized.
         return {
-            PriorityMode.PRIORITY_FIRST: _("gui", "settings", "priority_modes", "priority_first"),
             PriorityMode.PRIORITY_ONLY: _("gui", "settings", "priority_modes", "priority_only"),
             PriorityMode.ENDING_SOONEST: _("gui", "settings", "priority_modes", "ending_soonest"),
             PriorityMode.LOW_AVBL_FIRST: _(
@@ -1618,9 +1615,6 @@ class SettingsPanel:
             "tray": IntVar(master, self._settings.autostart_tray),
             "dark_mode": IntVar(master, int(self._settings.dark_mode)),
             "priority_mode": StringVar(master, self.PRIORITY_MODES[priority_mode]),
-            "ignore_linked": IntVar(
-                master, int(self._settings.ignore_linked)
-            ),
             "tray_notifications": IntVar(master, self._settings.tray_notifications),
             "enable_badges_emotes": IntVar(
                 master, int(self._settings.enable_badges_emotes)
@@ -1730,24 +1724,10 @@ class SettingsPanel:
         advanced_center = ttk.Frame(advanced_frame)
         advanced_center.grid(column=0, row=0)
 
-        # Ignore linked
-        ttk.Label(
-            advanced_frame, text=_("gui", "settings", "advanced", "ignore_linked")
-        ).grid(column=0, row=(irow := 0), sticky="w")
-        ttk.Checkbutton(
-            advanced_frame,
-            variable=self._vars["ignore_linked"],
-            command=lambda: setattr(
-                self._settings,
-                "ignore_linked",
-                bool(self._vars["ignore_linked"].get()),
-            ),
-        ).grid(column=1, row=(irow := irow + 1), sticky="e")
-
         # Warning message
         ttk.Label(
             advanced_center, text=_("gui", "settings", "advanced", "warning"), foreground="red"
-        ).grid(column=0, row=(irow := irow + 1), columnspan=2)
+        ).grid(column=0, row=(irow := 0), columnspan=2)
         ttk.Label(
             advanced_center,
             text=_("gui", "settings", "advanced", "warning_text"),
@@ -1807,7 +1787,7 @@ class SettingsPanel:
         ttk.Button(  # Move to top
             priority_frame,
             width=2,
-            text="⭱",
+            text="⇈",
             style="Arrow.TButton",
             command=partial(self.priority_move, MAX_INT),
         ).grid(column=1, row=1, sticky="nsew")
@@ -1815,7 +1795,7 @@ class SettingsPanel:
         ttk.Button(  # Move up
             priority_frame,
             width=2,
-            text="🠙",
+            text="↑",
             style="Arrow.TButton",
             command=partial(self.priority_move, 1),
         ).grid(column=1, row=2, sticky="nsew")
@@ -1823,7 +1803,7 @@ class SettingsPanel:
         ttk.Button(  # Move down
             priority_frame,
             width=2,
-            text="🠛",
+            text="↓",
             style="Arrow.TButton",
             command=partial(self.priority_move, -1),
         ).grid(column=1, row=3, sticky="nsew")
@@ -1831,7 +1811,7 @@ class SettingsPanel:
         ttk.Button(  # Move to bottom
             priority_frame,
             width=2,
-            text="⭳",
+            text="⇊",
             style="Arrow.TButton",
             command=partial(self.priority_move, -MAX_INT),
         ).grid(column=1, row=4, sticky="nsew")
@@ -2630,7 +2610,7 @@ class GUIManager:
         )
         s.configure("Treeview.Heading", background=header, foreground=fg, bordercolor=border)
         # Progressbar
-        s.configure("TProgressbar", background=accent, troughcolor=surface, lightcolor=accent, darkcolor=accent)
+        s.configure("TProgressbar", background=accent, troughcolor=surface)
         # Scrollbars
         s.configure(
             "Vertical.TScrollbar",
@@ -2822,7 +2802,7 @@ if __name__ == "__main__":
                 tray=False,
                 priority=[],
                 proxy=URL(),
-                dark_mode=True,
+                dark_mode=False,
                 alter=lambda: None,
                 language="English",
                 autostart_tray=False,

@@ -261,10 +261,9 @@ class State(Enum):
 
 
 class PriorityMode(Enum):
-    PRIORITY_FIRST = 0
-    PRIORITY_ONLY = 1
-    ENDING_SOONEST = 2
-    LOW_AVBL_FIRST = 3
+    PRIORITY_ONLY = 0
+    ENDING_SOONEST = 1
+    LOW_AVBL_FIRST = 2
 
 
 class GQLQuery(JsonType):

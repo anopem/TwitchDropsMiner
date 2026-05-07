@@ -11,7 +11,6 @@ import asyncio
 import logging
 import traceback
 import webbrowser
-import tkinter as tk
 from enum import Enum
 from pathlib import Path
 from functools import wraps
@@ -22,13 +21,15 @@ from collections import abc, OrderedDict
 from typing import Any, Literal, Callable, Generic, Mapping, TypeVar, ParamSpec, cast
 
 from yarl import URL
-from PIL.ImageTk import PhotoImage
-from PIL import Image as Image_module
 
 from exceptions import ExitRequest, ReloadRequest
 from constants import IS_PACKAGED, JsonType, PriorityMode
 from constants import _resource_path as resource_path  # noqa
 
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    import tkinter as tk
 
 _T = TypeVar("_T")  # type
 _D = TypeVar("_D")  # default
@@ -37,7 +38,10 @@ _JSON_T = TypeVar("_JSON_T", bound=Mapping[Any, Any])
 logger = logging.getLogger("TwitchDrops")
 
 
-def set_root_icon(root: tk.Tk, image_path: Path | str) -> None:
+def set_root_icon(root: "tk.Tk", image_path: Path | str) -> None:
+    from PIL.ImageTk import PhotoImage
+    from PIL import Image as Image_module
+
     with Image_module.open(image_path) as image:
         icon_photo = PhotoImage(master=root, image=image)
     root.iconphoto(True, icon_photo)  # type: ignore[arg-type]
@@ -82,7 +86,7 @@ def lock_file(path: Path) -> tuple[bool, io.TextIOWrapper]:
         except Exception:
             return False, file
         return True, file
-    if sys.platform == "linux":
+    if sys.platform in ("linux", "darwin"):
         import fcntl
         try:
             fcntl.lockf(file, fcntl.LOCK_EX | fcntl.LOCK_NB)
@@ -105,6 +109,10 @@ def timestamp(string: str) -> datetime:
         return datetime.strptime(string, "%Y-%m-%dT%H:%M:%S.%fZ").replace(tzinfo=timezone.utc)
     except ValueError:
         return datetime.strptime(string, "%Y-%m-%dT%H:%M:%SZ").replace(tzinfo=timezone.utc)
+
+
+def isonow() -> str:
+    return datetime.now(timezone.utc).isoformat(timespec="milliseconds").replace("+00:00", 'Z')
 
 
 CHARS_ASCII = string.ascii_letters + string.digits

@@ -3,7 +3,7 @@ name: Build
 on:
   push:
     branches:
-      - "webui"
+      - "no-link"
   pull_request:
   workflow_dispatch:
 

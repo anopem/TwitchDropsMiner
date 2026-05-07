@@ -403,8 +403,10 @@ GQL_QUERIES: dict[str, GQLPersistedQuery] = {
         "DirectoryPage_Game",
         "76cb069d835b8a02914c08dc42c421d0dafda8af5b113a3f19141824b901402f",
         variables={
-            "imageWidth": 50,
+            "limit": 30,  # limit of channels returned
             "slug": ...,  # game slug
+            "imageWidth": 50,
+            "includeCostreaming": False,
             "options": {
                 "broadcasterLanguages": [],
                 "freeformTags": None,
@@ -416,8 +418,6 @@ GQL_QUERIES: dict[str, GQLPersistedQuery] = {
                 "requestID": "JIRA-VXP-2397",
             },
             "sortTypeIsRecency": False,
-            "limit": 30,  # limit of channels returned
-            "includeCostreaming": False,
         },
     ),
     "SlugRedirect": GQLPersistedQuery(  # can be used to turn game name -> game slug

@@ -1626,6 +1626,5 @@ class Twitch:
             channel_data = acl_streams_map[channel_id]
             if channel_data["stream"] is None:
                 continue
-            # available_drops: list[JsonType] = acl_available_drops_map[channel_id]
-            # channel.external_update(channel_data, available_drops)
-            channel.external_update(channel_data, [])
+            available_drops: list[JsonType] = acl_available_drops_map.get(channel_id, [])
+            channel.external_update(channel_data, available_drops)

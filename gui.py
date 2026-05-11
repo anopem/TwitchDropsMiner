@@ -1733,19 +1733,6 @@ class SettingsPanel:
         advanced_center = ttk.Frame(advanced_frame)
         advanced_center.grid(column=0, row=0)
 
-        # Ignore linked
-        ttk.Label(
-            advanced_frame, text=_("gui", "settings", "advanced", "ignore_linked")
-        ).grid(column=0, row=(irow := 0), sticky="w")
-        ttk.Checkbutton(
-            advanced_frame,
-            variable=self._vars["ignore_linked"],
-            command=lambda: setattr(
-                self._settings,
-                "ignore_linked",
-                bool(self._vars["ignore_linked"].get()),
-            ),
-        ).grid(column=1, row=(irow := irow + 1), sticky="e")
 
         # Warning message
         ttk.Label(
@@ -1781,6 +1768,19 @@ class SettingsPanel:
                 bool(self._vars["available_drops_check"].get()),
             ),
         ).grid(column=1, row=irow, sticky="w")
+        # Ignore linked
+        ttk.Label(
+            advanced_center, text=_("gui", "settings", "advanced", "ignore_linked")
+        ).grid(column=0, row=(irow := irow + 1), sticky="w")
+        ttk.Checkbutton(
+            advanced_center,
+            variable=self._vars["ignore_linked"],
+            command=lambda: setattr(
+                self._settings,
+                "ignore_linked",
+                bool(self._vars["ignore_linked"].get()),
+            ),
+        ).grid(column=1, row=irow, sticky="e")
 
         # Priority section
         priority_frame = ttk.LabelFrame(
@@ -1810,7 +1810,7 @@ class SettingsPanel:
         ttk.Button(  # Move to top
             priority_frame,
             width=2,
-            text="⇈",
+            text="⭱",
             style="Arrow.TButton",
             command=partial(self.priority_move, MAX_INT),
         ).grid(column=1, row=1, sticky="nsew")
@@ -1818,7 +1818,7 @@ class SettingsPanel:
         ttk.Button(  # Move up
             priority_frame,
             width=2,
-            text="↑",
+            text="🠙",
             style="Arrow.TButton",
             command=partial(self.priority_move, 1),
         ).grid(column=1, row=2, sticky="nsew")
@@ -1826,7 +1826,7 @@ class SettingsPanel:
         ttk.Button(  # Move down
             priority_frame,
             width=2,
-            text="↓",
+            text="🠛",
             style="Arrow.TButton",
             command=partial(self.priority_move, -1),
         ).grid(column=1, row=3, sticky="nsew")
@@ -1834,7 +1834,7 @@ class SettingsPanel:
         ttk.Button(  # Move to bottom
             priority_frame,
             width=2,
-            text="⇊",
+            text="⭳",
             style="Arrow.TButton",
             command=partial(self.priority_move, -MAX_INT),
         ).grid(column=1, row=4, sticky="nsew")

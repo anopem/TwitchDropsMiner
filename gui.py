@@ -437,7 +437,7 @@ class SelectCombobox(ttk.Combobox):
 class StatusBar:
     def __init__(self, manager: GUIManager, master: ttk.Widget):
         frame = ttk.LabelFrame(master, text=_("gui", "status", "name"), padding=(4, 0, 4, 4))
-        frame.grid(column=0, row=0, columnspan=3, sticky="nsew", padx=2)
+        frame.grid(column=0, row=0, columnspan=3, sticky="nsew", padx=4, pady=(8,0))
         self._label = ttk.Label(frame)
         self._label.grid(column=0, row=0, sticky="nsew")
 
@@ -456,7 +456,7 @@ class _WSEntry(TypedDict):
 class WebsocketStatus:
     def __init__(self, manager: GUIManager, master: ttk.Widget):
         frame = ttk.LabelFrame(master, text=_("gui", "websocket", "name"), padding=(4, 0, 4, 4))
-        frame.grid(column=0, row=1, sticky="nsew", padx=2)
+        frame.grid(column=0, row=1, sticky="nsew", padx=4, pady=(8,0))
         self._status_var = StringVar(frame)
         self._topics_var = StringVar(frame)
         ttk.Label(
@@ -529,7 +529,7 @@ class LoginForm:
         self._manager = manager
         self._var = StringVar(master)
         frame = ttk.LabelFrame(master, text=_("gui", "login", "name"), padding=(4, 0, 4, 4))
-        frame.grid(column=1, row=1, sticky="nsew", padx=2)
+        frame.grid(column=1, row=1, sticky="nsew", padx=4, pady=(8,0))
         frame.columnconfigure(0, weight=2)
         frame.columnconfigure(1, weight=1)
         frame.rowconfigure(4, weight=1)
@@ -661,7 +661,7 @@ class CampaignProgress:
         self._frame = frame = ttk.LabelFrame(
             master, text=_("gui", "progress", "name"), padding=(4, 0, 4, 4)
         )
-        frame.grid(column=0, row=2, columnspan=2, sticky="nsew", padx=2)
+        frame.grid(column=0, row=2, columnspan=2, sticky="nsew", padx=4, pady=(8,0))
         frame.columnconfigure(0, weight=2)
         frame.columnconfigure(1, weight=1)
         game_campaign = ttk.Frame(frame)
@@ -805,7 +805,7 @@ class CampaignProgress:
 class ConsoleOutput:
     def __init__(self, manager: GUIManager, master: ttk.Widget):
         frame = ttk.LabelFrame(master, text=_("gui", "output"), padding=(4, 0, 4, 4))
-        frame.grid(column=0, row=3, columnspan=3, sticky="nsew", padx=2)
+        frame.grid(column=0, row=3, columnspan=3, sticky="nsew", padx=4, pady=(8,0))
         # tell master frame that the containing row can expand
         master.rowconfigure(3, weight=1)
         frame.rowconfigure(0, weight=1)  # let the frame expand
@@ -869,7 +869,7 @@ class ChannelList:
     def __init__(self, manager: GUIManager, master: ttk.Widget):
         self._manager = manager
         frame = ttk.LabelFrame(master, text=_("gui", "channels", "name"), padding=(4, 0, 4, 4))
-        frame.grid(column=2, row=1, rowspan=2, sticky="nsew", padx=2)
+        frame.grid(column=2, row=1, rowspan=2, sticky="nsew", padx=4, pady=(8,0))
         # tell master frame that the containing column can expand
         master.columnconfigure(2, weight=1)
         frame.rowconfigure(1, weight=1)
@@ -1268,7 +1268,7 @@ class InventoryOverview:
         manager.tabs.add_view_event(self._on_tab_switched)
         # Filtering options
         filter_frame = ttk.LabelFrame(
-            master, text=_("gui", "inventory", "filter", "name"), padding=(4, 0, 4, 4)
+            master, text=_("gui", "inventory", "filter", "name"), padding=4
         )
         LABEL_SPACING = 20
         filter_frame.grid(column=0, row=0, columnspan=2, sticky="nsew")
@@ -1411,7 +1411,7 @@ class InventoryOverview:
 
     async def add_campaign(self, campaign: DropsCampaign) -> None:
         campaign_frame = ttk.Frame(self._main_frame, relief="ridge", borderwidth=1, padding=4)
-        campaign_frame.grid(column=0, row=len(self._campaigns), sticky="nsew", pady=3)
+        campaign_frame.grid(column=0, row=len(self._campaigns), sticky="nsew", pady=5, padx=5)
         campaign_frame.rowconfigure(4, weight=1)
         campaign_frame.columnconfigure(1, weight=1)
         campaign_frame.columnconfigure(3, weight=10000)
@@ -1643,28 +1643,32 @@ class SettingsPanel:
         general_frame = ttk.LabelFrame(
             center_frame, padding=(4, 0, 4, 4), text=_("gui", "settings", "general", "name")
         )
-        general_frame.grid(column=0, row=0, sticky="nsew")
+        general_frame.grid(column=0, row=0, sticky="nsew", padx=(0, 8))
         # use another frame to center the options within the section
         # NOTE: this can be adjusted or removed later on if more options were to be added
         general_frame.rowconfigure(0, weight=1)
         general_frame.columnconfigure(0, weight=1)
         general_center = ttk.Frame(general_frame)
-        general_center.grid(column=0, row=0)
+        general_center.grid(column=0, row=0, sticky="nsew", padx=4, pady=4)
+        general_center.columnconfigure(0, weight=1)
+        general_center.rowconfigure(0, weight=1)
 
         # language frame
         language_frame = ttk.Frame(general_center)
-        language_frame.grid(column=0, row=0)
-        ttk.Label(language_frame, text="Language 🌐 (requires restart): ").grid(column=0, row=0)
+        language_frame.grid(column=0, row=0, sticky="we")
+        language_frame.columnconfigure(0, weight=1)
+        ttk.Label(language_frame, text="Language 🌐 (requires restart): ").grid(column=0, row=0, sticky="w")
         SelectCombobox(
             language_frame,
             values=list(_.languages),
             textvariable=self._vars["language"],
             command=lambda e: setattr(self._settings, "language", self._vars["language"].get()),
-        ).grid(column=1, row=0)
+        ).grid(column=1, row=0, sticky="e")
 
         # checkboxes frame
         checkboxes_frame = ttk.Frame(general_center)
-        checkboxes_frame.grid(column=0, row=1)
+        checkboxes_frame.grid(column=0, row=1, sticky="nsew", pady=(4, 0))
+        checkboxes_frame.columnconfigure(0, weight=1)
         # ttk.Label(
         #     checkboxes_frame, text=_("gui", "settings", "general", "autostart")
         # ).grid(column=0, row=(irow := 0), sticky="e")
@@ -1692,26 +1696,32 @@ class SettingsPanel:
         #     ).grid(column=1, row=irow, sticky="w")
         ttk.Label(
             checkboxes_frame, text=_("gui", "settings", "general", "dark_mode")
-        ).grid(column=0, row=(irow := 0), sticky="e")
+        ).grid(column=0, row=(irow := 0), sticky="w")
         ttk.Checkbutton(
             checkboxes_frame,
             variable=self._vars["dark_mode"],
             command=self.update_dark_mode,
-        ).grid(column=1, row=irow, sticky="w")
+        ).grid(column=1, row=irow, sticky="e")
+
+        ttk.Separator(checkboxes_frame).grid(column=0, columnspan=2, row=(irow := irow + 1), sticky="we", pady=4)
+
         ttk.Label(
             checkboxes_frame, text=_("gui", "settings", "general", "priority_mode")
-        ).grid(column=0, row=(irow := irow + 1), sticky="e")
+        ).grid(column=0, row=(irow := irow + 1), sticky="w")
         SelectCombobox(
             checkboxes_frame,
             command=self.priority_mode,
             textvariable=self._vars["priority_mode"],
             values=list(self.PRIORITY_MODES.values()),
-        ).grid(column=1, row=irow, sticky="w")
+        ).grid(column=1, row=irow, sticky="e")
+
+        ttk.Separator(checkboxes_frame).grid(column=0, columnspan=2, row=(irow := irow + 1), sticky="we", pady=4)
 
         # proxy frame
         proxy_frame = ttk.Frame(general_center)
-        proxy_frame.grid(column=0, row=2)
-        ttk.Label(proxy_frame, text=_("gui", "settings", "general", "proxy")).grid(column=0, row=0)
+        proxy_frame.grid(column=0, row=2, sticky="nsew")
+        proxy_frame.columnconfigure(0, weight=1)
+        ttk.Label(proxy_frame, text=_("gui", "settings", "general", "proxy")).grid(column=0, row=0, sticky="w")
         self._proxy = PlaceholderEntry(
             proxy_frame,
             width=37,
@@ -1721,17 +1731,17 @@ class SettingsPanel:
             placeholder="http://username:password@address:port",
         )
         self._proxy.config(validatecommand=partial(proxy_validate, self._proxy, self._settings))
-        self._proxy.grid(column=0, row=1)
+        self._proxy.grid(column=0, row=0, sticky="e")
 
         # Advanced section
         advanced_frame = ttk.LabelFrame(
             center_frame, padding=(4, 0, 4, 4), text=_("gui", "settings", "advanced", "name")
         )
-        advanced_frame.grid(column=0, row=1, sticky="nsew")
+        advanced_frame.grid(column=0, row=1, sticky="nsew", pady=(8, 0), padx=(0, 8))
         advanced_frame.columnconfigure(0, weight=1)
         advanced_frame.rowconfigure(0, weight=1)
         advanced_center = ttk.Frame(advanced_frame)
-        advanced_center.grid(column=0, row=0)
+        advanced_center.grid(column=0, row=0, padx=4, pady=4)
 
 
         # Warning message
@@ -1742,11 +1752,11 @@ class SettingsPanel:
             advanced_center,
             text=_("gui", "settings", "advanced", "warning_text"),
             foreground="goldenrod",
-        ).grid(column=0, row=(irow := irow + 1), columnspan=2)
+        ).grid(column=0, row=(irow := irow + 1), columnspan=2, pady=(0, 8))
         # Toggles for badges and emotes, and available drops check
         ttk.Label(
             advanced_center, text=_("gui", "settings", "advanced", "enable_badges_emotes")
-        ).grid(column=0, row=(irow := irow + 1), sticky="e")
+        ).grid(column=0, row=(irow := irow + 1), sticky="w")
         ttk.Checkbutton(
             advanced_center,
             variable=self._vars["enable_badges_emotes"],
@@ -1755,10 +1765,10 @@ class SettingsPanel:
                 "enable_badges_emotes",
                 bool(self._vars["enable_badges_emotes"].get()),
             ),
-        ).grid(column=1, row=irow, sticky="w")
+        ).grid(column=1, row=irow, sticky="e")
         ttk.Label(
             advanced_center, text=_("gui", "settings", "advanced", "available_drops_check")
-        ).grid(column=0, row=(irow := irow + 1), sticky="e")
+        ).grid(column=0, row=(irow := irow + 1), sticky="w")
         ttk.Checkbutton(
             advanced_center,
             variable=self._vars["available_drops_check"],
@@ -1767,7 +1777,10 @@ class SettingsPanel:
                 "available_drops_check",
                 bool(self._vars["available_drops_check"].get()),
             ),
-        ).grid(column=1, row=irow, sticky="w")
+        ).grid(column=1, row=irow, sticky="e")
+
+        ttk.Separator(advanced_center).grid(column=0, columnspan=2, row=(irow := irow + 1), sticky="we", pady=6)
+
         # Ignore linked
         ttk.Label(
             advanced_center, text=_("gui", "settings", "advanced", "ignore_linked")
@@ -1784,13 +1797,13 @@ class SettingsPanel:
 
         # Priority section
         priority_frame = ttk.LabelFrame(
-            center_frame, padding=(4, 0, 4, 4), text=_("gui", "settings", "priority")
+            center_frame, text=_("gui", "settings", "priority")
         )
-        priority_frame.grid(column=1, row=0, rowspan=2, sticky="nsew")
+        priority_frame.grid(column=1, row=0, rowspan=2, sticky="nsew", padx=(0, 8))
         self._priority_entry = PlaceholderCombobox(
             priority_frame, placeholder=_("gui", "settings", "game_name"), width=30
         )
-        self._priority_entry.grid(column=0, row=0, sticky="ew")
+        self._priority_entry.grid(column=0, row=0, sticky="nsew")
         priority_frame.columnconfigure(0, weight=1)
         ttk.Button(
             priority_frame, text="➕", command=self.priority_add, width=3, style="Large.TButton"
@@ -1798,7 +1811,8 @@ class SettingsPanel:
         self._priority_list = PaddedListbox(
             priority_frame,
             height=12,
-            padding=(1, 0),
+            padding=(0, 1, 1, 0),
+            borderwidth=0,
             activestyle="none",
             selectmode="single",
             highlightthickness=0,
@@ -1846,20 +1860,21 @@ class SettingsPanel:
 
         # Exclude section
         exclude_frame = ttk.LabelFrame(
-            center_frame, padding=(4, 0, 4, 4), text=_("gui", "settings", "exclude")
+            center_frame, text=_("gui", "settings", "exclude")
         )
         exclude_frame.grid(column=2, row=0, rowspan=2, sticky="nsew")
         self._exclude_entry = PlaceholderCombobox(
             exclude_frame, placeholder=_("gui", "settings", "game_name"), width=26
         )
-        self._exclude_entry.grid(column=0, row=0, sticky="ew")
+        self._exclude_entry.grid(column=0, row=0, sticky="nsew")
         ttk.Button(
             exclude_frame, text="➕", command=self.exclude_add, width=3, style="Large.TButton"
         ).grid(column=1, row=0)
         self._exclude_list = PaddedListbox(
             exclude_frame,
             height=12,
-            padding=(1, 0),
+            padding=(0, 1, 1, 0),
+            borderwidth=0,
             activestyle="none",
             selectmode="single",
             highlightthickness=0,
@@ -1875,7 +1890,7 @@ class SettingsPanel:
 
         # Reload button
         reload_frame = ttk.Frame(center_frame)
-        reload_frame.grid(column=0, row=2, columnspan=3, pady=4)
+        reload_frame.grid(column=0, row=2, columnspan=3, pady=(8, 4))
         ttk.Label(reload_frame, text=_("gui", "settings", "reload_text")).grid(column=0, row=0)
         ttk.Button(
             reload_frame,
@@ -2140,7 +2155,7 @@ class HelpTab:
         irow = 0
         # About
         about = ttk.LabelFrame(center_frame, padding=(4, 0, 4, 4), text="About")
-        about.grid(column=0, row=(irow := irow + 1), sticky="nsew", padx=2)
+        about.grid(column=0, row=(irow := irow + 1), sticky="nsew", padx=4, pady=(8,0))
         about.columnconfigure(2, weight=1)
         # About - created by
         ttk.Label(
@@ -2174,7 +2189,7 @@ class HelpTab:
         links = ttk.LabelFrame(
             center_frame, padding=(4, 0, 4, 4), text=_("gui", "help", "links", "name")
         )
-        links.grid(column=0, row=(irow := irow + 1), sticky="nsew", padx=2)
+        links.grid(column=0, row=(irow := irow + 1), sticky="nsew", padx=4, pady=(8,0))
         LinkLabel(
             links,
             link="https://www.twitch.tv/drops/inventory",
@@ -2189,14 +2204,14 @@ class HelpTab:
         howitworks = ttk.LabelFrame(
             center_frame, padding=(4, 0, 4, 4), text=_("gui", "help", "how_it_works")
         )
-        howitworks.grid(column=0, row=(irow := irow + 1), sticky="nsew", padx=2)
+        howitworks.grid(column=0, row=(irow := irow + 1), sticky="nsew", padx=4, pady=(8,0))
         ttk.Label(
             howitworks, text=_("gui", "help", "how_it_works_text"), wraplength=self.WIDTH
         ).grid(sticky="nsew")
         getstarted = ttk.LabelFrame(
             center_frame, padding=(4, 0, 4, 4), text=_("gui", "help", "getting_started")
         )
-        getstarted.grid(column=0, row=(irow := irow + 1), sticky="nsew", padx=2)
+        getstarted.grid(column=0, row=(irow := irow + 1), sticky="nsew", padx=4, pady=(8,0))
         ttk.Label(
             getstarted, text=_("gui", "help", "getting_started_text"), wraplength=self.WIDTH
         ).grid(sticky="nsew")
@@ -2563,6 +2578,7 @@ class GUIManager:
         s.configure("MS.TLabel", font=self._fonts["monospaced"])
 
         # Base containers and labels
+        s.configure("TSeparator", background=border)
         s.configure("TFrame", background=bg, foreground=fg)
         s.configure("TLabel", background=bg, foreground=fg)
         s.configure("TLabelframe", background=bg, foreground=fg)
@@ -2632,8 +2648,15 @@ class GUIManager:
             foreground=[("selected", sel_fg)],
         )
         s.configure("Treeview.Heading", background=header, foreground=fg, bordercolor=border)
+        s.configure("Treeview.Hover", background='lightblue')
+
+        s.map(
+            "Treeview.Heading",
+            background=[("active", sel_bg)]
+        )
+
         # Progressbar
-        s.configure("TProgressbar", background=accent, troughcolor=surface)
+        s.configure("TProgressbar", background=accent, troughcolor=surface, lightcolor=accent, darkcolor=accent)
         # Scrollbars
         s.configure(
             "Vertical.TScrollbar",

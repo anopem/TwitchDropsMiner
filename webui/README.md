@@ -14,20 +14,25 @@ When you start the WebUI:
 
 ## Installation
 
-The WebUI requires the NiceGUI dependencies:
+The WebUI requires NiceGUI to be installed:
 
 ```bash
-pip install -r requirements-nicegui.txt
+pip install nicegui
 ```
 
 ## Usage
 
 ### Starting the WebUI
 
-Run the dedicated WebUI entry point:
+Run the application using `entrypoint.py` with the `UI_BACKEND` environment variable set to `nicegui`:
 
 ```bash
-python main_webui.py
+# Linux/Mac
+UI_BACKEND=nicegui python entrypoint.py
+
+# Windows
+set UI_BACKEND=nicegui
+python entrypoint.py
 ```
 
 See `python main_webui.py --help` for available command-line options (e.g. `--stdlog`, `-v`).
@@ -36,31 +41,34 @@ See `python main_webui.py --help` for available command-line options (e.g. `--st
 
 Once started, open your web browser and navigate to:
 - **Default**: `http://localhost:5800`
+- **Custom**: Depends on your `webui_host` and `webui_port` settings
 - **Custom**: Set via the `WEBUI_HOST` and `WEBUI_PORT` environment variables
 
 The WebUI is accessible from any device on your network. Use your machine's IP address to access remotely (e.g., `http://192.168.1.100:5800`).
 
 ### Using tkinter Instead
 
-To use the traditional desktop GUI, run the original entry point:
+To use the traditional desktop GUI instead, either omit the environment variable or set it to `tkinter`:
 
 ```bash
-python main.py
+# Uses tkinter (default behavior)
+python entrypoint.py
+
+# Or explicitly
+UI_BACKEND=tkinter python entrypoint.py
 ```
 
 ## Configuration
 
-The WebUI host and port are configured via environment variables:
+WebUI settings are stored in your standard Twitch Drops Miner settings file (`settings.json`):
 
-- **WEBUI_HOST**: Network interface to bind to (default: `0.0.0.0`)
+- **webui_host**: Network interface to bind to (default: `0.0.0.0`)
   - `0.0.0.0` - Listen on all interfaces (accessible from other devices)
   - `127.0.0.1` or `localhost` - Local access only
+  
+- **webui_port**: Port to serve on (default: `5800`)
 
-- **WEBUI_PORT**: Port to serve on, must be an integer between 1 and 65535 (default: `5800`)
-
-```bash
-WEBUI_HOST=127.0.0.1 WEBUI_PORT=8080 python main_webui.py
-```
+You can modify these settings in the WebUI's Settings tab or by editing `settings.json` directly.
 
 ## Features
 
@@ -84,7 +92,7 @@ The WebUI provides all the functionality of the traditional GUI:
 ## Security Notes
 
 - By default, the WebUI listens on all interfaces (`0.0.0.0`), making it accessible from other devices
-- Set `WEBUI_HOST=127.0.0.1` for local-only access
+- Use `127.0.0.1` as the host for local-only access
 - No authentication is built-in - anyone on your network can access the interface
 - Consider firewall rules or a reverse proxy if exposing beyond your local network
 
@@ -96,12 +104,12 @@ pip install nicegui
 ```
 
 **Cannot access from another device**
-- Check that `WEBUI_HOST` is set to `0.0.0.0`
+- Check that `webui_host` is set to `0.0.0.0` in settings
 - Verify firewall rules allow connections on the configured port
 - Use the host machine's IP address, not `localhost`
 
 **Port already in use**
-- Change `WEBUI_PORT` to a different value (e.g., `8081` or `9000`)
+- Change `webui_port` to a different value (e.g., `8081` or `9000`)
 - Find what's using the port: `lsof -i :5800` (Linux/Mac) or `netstat -ano | findstr :5800` (Windows)
 
 ## Technical Note

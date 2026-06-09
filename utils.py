@@ -23,7 +23,7 @@ from typing import Any, Literal, Callable, Generic, Mapping, TypeVar, ParamSpec,
 from yarl import URL
 
 from exceptions import ExitRequest, ReloadRequest
-from constants import IS_PACKAGED, JsonType, PriorityMode
+from constants import IS_PACKAGED, JsonType, PriorityMode, LogLevel
 from constants import _resource_path as resource_path  # noqa
 
 from typing import TYPE_CHECKING
@@ -200,6 +200,7 @@ SERIALIZE_ENV: dict[str, Callable[[Any], object]] = {
     "set": set,
     "URL": URL,
     "PriorityMode": PriorityMode,
+    "LogLevel": LogLevel,
     "datetime": lambda d: datetime.fromtimestamp(d, timezone.utc),
 }
 

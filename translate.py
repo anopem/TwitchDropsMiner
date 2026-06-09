@@ -164,6 +164,7 @@ class GUISettingsGeneral(TypedDict):
     dark_mode: str
     priority_mode: str
     proxy: str
+    gui_log_level: str
 
 
 class GUISettingsAdvanced(TypedDict):
@@ -181,11 +182,15 @@ class GUIPriorityModes(TypedDict):
     ending_soonest: str
     low_availability: str
 
+class GUILogLevels(TypedDict):
+    error: str
+    info: str
 
 class GUISettings(TypedDict):
     general: GUISettingsGeneral
     advanced: GUISettingsAdvanced
     priority_modes: GUIPriorityModes
+    gui_log_levels: GUILogLevels
     game_name: str
     priority: str
     exclude: str
@@ -375,7 +380,8 @@ default_translation: Translation = {
                 "tray_notifications": "Tray notifications: ",
                 "dark_mode": "Dark mode: ",
                 "priority_mode": "Priority mode: ",
-                "proxy": "Proxy (requires restart):",
+                "proxy": "Proxy (requires restart): ",
+                "gui_log_level": "Log level in window: ",
             },
             "advanced": {
                 "name": "Advanced",
@@ -394,6 +400,10 @@ default_translation: Translation = {
                 "priority_only": "Priority list only",
                 "ending_soonest": "Ending soonest",
                 "low_availability": "Low availability first",
+            },
+            "gui_log_levels": {
+                "error": "Show errors",
+                "info": "Show info only",
             },
             "game_name": "Game name",
             "priority": "Priority",

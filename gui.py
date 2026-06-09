@@ -50,6 +50,7 @@ from constants import (
     State,
     PriorityMode,
     FILE_FORMATTER,
+    LogLevel,
 )
 if sys.platform == "win32":
     from registry import RegistryKey, ValueType, ValueNotFound
@@ -830,13 +831,17 @@ class ConsoleOutput:
         self._manager = manager
 
     def print(self, message: str):
-        stamp = datetime.now().strftime("%X")
-        if '\n' in message:
-            message = message.replace('\n', f"\n{stamp}: ")
-        self._text.config(state="normal")
-        self._text.insert("end", f"{stamp}: {message}\n")
-        self._text.see("end")  # scroll to the newly added line
-        self._text.config(state="disabled")
+        log_level = self._manager._twitch.settings.gui_log_level
+        if re.match(rf':\s+ERROR:\s', message) and log_level is LogLevel.ERROR:
+            pass # Dont print errors if log_level is 0/ERROR
+        else:
+            stamp = datetime.now().strftime("%X")
+            if '\n' in message:
+                message = message.replace('\n', f"\n{stamp}: ")
+            self._text.config(state="normal")
+            self._text.insert("end", f"{stamp}: {message}\n")
+            self._text.see("end")  # scroll to the newly added line
+            self._text.config(state="disabled")
         if self._manager._twitch.settings.stdlog:
             record = logging.LogRecord(
                 name="GUI",
@@ -897,7 +902,7 @@ class ChannelList:
         scroll.grid(column=1, row=1, sticky="ns")
         self._font = Font(frame, manager._style.lookup("Treeview", "font"))
         self._const_width: set[str] = set()
-        table.tag_configure("watching", background="gray70")
+        table.tag_configure("watching", background="#0d99ff")
         table.bind("<Button-1>", self._disable_column_resize)
         table.bind("<<TreeviewSelect>>", self._selected)
         self._add_column("#0", '', width=0)
@@ -1360,7 +1365,7 @@ class InventoryOverview:
             and (
                 excluded or (
                     campaign.game.name not in self._settings.exclude
-                    and not priority_only or campaign.game.name in self._settings.priority
+                    and not priority_only #or campaign.game.name in self._settings.priority
                 )
             )
             and (finished or not campaign.finished)
@@ -1588,6 +1593,7 @@ class _SettingsVars(TypedDict):
     tray_notifications: IntVar
     enable_badges_emotes: IntVar
     available_drops_check: IntVar
+    gui_log_level: StringVar
 
 
 class SettingsPanel:
@@ -1607,6 +1613,15 @@ class SettingsPanel:
             ),
         }
 
+    @cached_property
+    def LOG_LEVEL(self) -> dict[LogLevel, str]:
+        # NOTE: Translation calls have to be deferred here,
+        # to allow changing the language before the settings panel is initialized.
+        return {
+            LogLevel.ERROR: _("gui", "settings", "gui_log_levels", "error"),
+            LogLevel.INFO: _("gui", "settings", "gui_log_levels", "info"),
+        }
+
     def __init__(self, manager: GUIManager, master: ttk.Widget):
         self._manager = manager
         self._settings: Settings = manager._twitch.settings
@@ -1614,6 +1629,10 @@ class SettingsPanel:
         if priority_mode not in self.PRIORITY_MODES:
             priority_mode = PriorityMode.PRIORITY_ONLY
             self._settings.priority_mode = priority_mode
+        log_level = self._settings.gui_log_level
+        if log_level not in self.LOG_LEVEL:
+            log_level = LogLevel.ERROR
+            self._settings.gui_log_level = log_level
         self._vars: _SettingsVars = {
             "autostart": IntVar(master, 0),
             "language": StringVar(master, _.current),
@@ -1631,6 +1650,7 @@ class SettingsPanel:
             "available_drops_check": IntVar(
                 master, int(self._settings.available_drops_check)
             ),
+            "gui_log_level": StringVar(master, self.LOG_LEVEL[log_level]),
         }
         self._game_names: set[str] = set()
         master.rowconfigure(0, weight=1)
@@ -1701,6 +1721,16 @@ class SettingsPanel:
             checkboxes_frame,
             variable=self._vars["dark_mode"],
             command=self.update_dark_mode,
+        ).grid(column=1, row=irow, sticky="e")
+
+        ttk.Label(
+            checkboxes_frame, text=_("gui", "settings", "general", "gui_log_level")
+        ).grid(column=0, row=(irow := irow + 1), sticky="w")
+        SelectCombobox(
+            checkboxes_frame,
+            command=self.gui_log_level,
+            textvariable=self._vars["gui_log_level"],
+            values=list(self.LOG_LEVEL.values()),
         ).grid(column=1, row=irow, sticky="e")
 
         ttk.Separator(checkboxes_frame).grid(column=0, columnspan=2, row=(irow := irow + 1), sticky="we", pady=4)
@@ -2096,6 +2126,13 @@ class SettingsPanel:
         for value, name in self.PRIORITY_MODES.items():
             if mode_name == name:
                 self._settings.priority_mode = value
+                break
+
+    def gui_log_level(self, event: tk.Event[ttk.Combobox]) -> None:
+        mode_name: str = self._vars["gui_log_level"].get()
+        for value, name in self.LOG_LEVEL.items():
+            if mode_name == name:
+                self._settings.gui_log_level = value
                 break
 
     def exclude_add(self) -> None:
@@ -2858,6 +2895,7 @@ if __name__ == "__main__":
                 available_drops_check=False,
                 logging_level=LOGGING_LEVELS[0],
                 priority_mode=PriorityMode.PRIORITY_FIRST,
+                gui_log_level=LogLevel.ERROR,
             )
         )
         mock.change_state = lambda state: mock.gui.print(f"State change: {state.value}")

@@ -267,6 +267,11 @@ class PriorityMode(Enum):
     LOW_AVBL_FIRST = 3
 
 
+class LogLevel(Enum):
+    ERROR = 0
+    INFO = 1
+
+
 class GQLQuery(JsonType):
     def __init__(self, query: str, g64data: str):
         super().__init__(

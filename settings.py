@@ -5,7 +5,7 @@ from typing import Any, TypedDict, TYPE_CHECKING
 from yarl import URL
 
 from utils import json_load, json_save
-from constants import CONFIG_PATH, SETTINGS_PATH, DEFAULT_LANG, PriorityMode
+from constants import CONFIG_PATH, SETTINGS_PATH, DEFAULT_LANG, PriorityMode, LogLevel
 
 if TYPE_CHECKING:
     from main import ParsedArgs
@@ -24,6 +24,7 @@ class SettingsFile(TypedDict):
     enable_badges_emotes: bool
     available_drops_check: bool
     priority_mode: PriorityMode
+    gui_log_level: LogLevel
 
 
 default_settings: SettingsFile = {
@@ -39,6 +40,7 @@ default_settings: SettingsFile = {
     "enable_badges_emotes": False,
     "available_drops_check": False,
     "priority_mode": PriorityMode.PRIORITY_FIRST,
+    "gui_log_level": LogLevel.ERROR,
 }
 
 
@@ -65,11 +67,13 @@ class Settings:
     enable_badges_emotes: bool
     available_drops_check: bool
     priority_mode: PriorityMode
+    gui_log_level: LogLevel
 
     PASSTHROUGH = ("_settings", "_args", "_altered")
 
     def __init__(self, args: ParsedArgs):
         CONFIG_PATH.mkdir(parents=True, exist_ok=True)
+
         self._settings: SettingsFile = json_load(SETTINGS_PATH, default_settings)
         self._args: ParsedArgs = args
         self._altered: bool = False

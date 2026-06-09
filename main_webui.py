@@ -43,7 +43,16 @@ if __name__ == "__main__":
     from version import __version__
     from exceptions import CaptchaRequired
     from utils import lock_file
-    from constants import LOGGING_LEVELS, SELF_PATH, FILE_FORMATTER, LOG_PATH, LOCK_PATH
+    from constants import (
+        LOGGING_LEVELS,
+        SELF_PATH,
+        FILE_FORMATTER,
+        LOG_PATH,
+        LOCK_PATH,
+        CONFIG_PATH,
+    )
+    from webui.auth import AuthManager
+    from webui.ssl import get_ssl_kwargs
 
     warnings.simplefilter("default", ResourceWarning)
 
@@ -123,6 +132,9 @@ if __name__ == "__main__":
         print("Install it with: pip install nicegui")
         sys.exit(1)
     from pathlib import Path
+
+    # Initialize authentication if enabled
+    AuthManager()
 
     # Global state for the Twitch client
     twitch_client: Twitch | None = None
@@ -247,6 +259,7 @@ if __name__ == "__main__":
                 show=False,
                 reload=False,
                 favicon=Path(__file__).parent / "icons" / "pickaxe.ico",
+                **get_ssl_kwargs(CONFIG_PATH / "certs"),
             )
         except KeyboardInterrupt:
             pass

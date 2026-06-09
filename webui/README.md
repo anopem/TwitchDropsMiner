@@ -14,25 +14,20 @@ When you start the WebUI:
 
 ## Installation
 
-The WebUI requires NiceGUI to be installed:
+The WebUI requires the NiceGUI dependencies:
 
 ```bash
-pip install nicegui
+pip install -r requirements-nicegui.txt
 ```
 
 ## Usage
 
 ### Starting the WebUI
 
-Run the application using `entrypoint.py` with the `UI_BACKEND` environment variable set to `nicegui`:
+Run the dedicated WebUI entry point:
 
 ```bash
-# Linux/Mac
-UI_BACKEND=nicegui python entrypoint.py
-
-# Windows
-set UI_BACKEND=nicegui
-python entrypoint.py
+python main_webui.py
 ```
 
 See `python main_webui.py --help` for available command-line options (e.g. `--stdlog`, `-v`).
@@ -40,35 +35,46 @@ See `python main_webui.py --help` for available command-line options (e.g. `--st
 ### Accessing the Interface
 
 Once started, open your web browser and navigate to:
-- **Default**: `http://localhost:5800`
-- **Custom**: Depends on your `webui_host` and `webui_port` settings
-- **Custom**: Set via the `WEBUI_HOST` and `WEBUI_PORT` environment variables
+- **Default**: `http://localhost:5800` (or `https://localhost:5800` with `SECURE_CONNECTION=1`)
+- **Custom**: Set via the `WEBUI_HOST`, `WEBUI_PORT`, and `SECURE_CONNECTION` environment variables
 
 The WebUI is accessible from any device on your network. Use your machine's IP address to access remotely (e.g., `http://192.168.1.100:5800`).
 
 ### Using tkinter Instead
 
-To use the traditional desktop GUI instead, either omit the environment variable or set it to `tkinter`:
+To use the traditional desktop GUI, run the original entry point:
 
 ```bash
-# Uses tkinter (default behavior)
-python entrypoint.py
-
-# Or explicitly
-UI_BACKEND=tkinter python entrypoint.py
+python main.py
 ```
 
 ## Configuration
 
-WebUI settings are stored in your standard Twitch Drops Miner settings file (`settings.json`):
+The WebUI host, port, and authentication are configured via environment variables:
 
-- **webui_host**: Network interface to bind to (default: `0.0.0.0`)
+- **WEBUI_HOST**: Network interface to bind to (default: `0.0.0.0`)
   - `0.0.0.0` - Listen on all interfaces (accessible from other devices)
   - `127.0.0.1` or `localhost` - Local access only
-  
-- **webui_port**: Port to serve on (default: `5800`)
 
-You can modify these settings in the WebUI's Settings tab or by editing `settings.json` directly.
+- **WEBUI_PORT**: Port to serve on, must be an integer between 1 and 65535 (default: `5800`)
+
+- **WEBUI_AUTH**: Enable login authentication (default: `0`)
+  - `1` - Require username/password to access the WebUI
+  - `0` - No authentication (auth system is completely disabled)
+
+- **SECURE_CONNECTION**: Enable HTTPS (default: `0`)
+  - `1` - Serve the WebUI over HTTPS using TLS certificates
+  - `0` - Serve the WebUI over plain HTTP
+
+  When `1`, certificates are read from `config/certs/`:
+  - `web-privkey.pem` — Web server's private key
+  - `web-fullchain.pem` — Web server's certificate, bundled with any root and intermediate certificates
+
+  If either file is missing, a self-signed certificate is automatically generated and written to those paths. Self-signed certs include `localhost` and `127.0.0.1` as Subject Alternative Names, plus the container hostname and its resolved IP when running in Docker with `--hostname`. Auto-generation requires `openssl` to be installed.
+
+```bash
+WEBUI_HOST=127.0.0.1 WEBUI_PORT=8080 WEBUI_AUTH=1 SECURE_CONNECTION=1 python main_webui.py
+```
 
 ## Features
 
@@ -92,9 +98,22 @@ The WebUI provides all the functionality of the traditional GUI:
 ## Security Notes
 
 - By default, the WebUI listens on all interfaces (`0.0.0.0`), making it accessible from other devices
-- Use `127.0.0.1` as the host for local-only access
-- No authentication is built-in - anyone on your network can access the interface
+- Set `WEBUI_HOST=127.0.0.1` for local-only access
 - Consider firewall rules or a reverse proxy if exposing beyond your local network
+
+### Authentication
+
+When enabled, the WebUI requires a login before accessing the dashboard:
+
+- **First visit** (no users exist): You'll be prompted to register an admin account with a username, password, and confirmation
+- **Subsequent visits**: Sign in with the registered username and password
+- Credentials are stored hashed (argon2) in `config/webui_auth.db`
+- A random JWT signing secret is auto-generated and stored in the same database
+- Login attempts are rate-limited to 5 per minute per IP address
+- A logout button appears in the header bar when auth is enabled
+- Sessions last 30 days via an httponly cookie
+
+Authentication is disabled by default (`WEBUI_AUTH=0`). The entire auth system is skipped — no middleware, no login page, no database is created.
 
 ## Troubleshooting
 
@@ -104,12 +123,12 @@ pip install nicegui
 ```
 
 **Cannot access from another device**
-- Check that `webui_host` is set to `0.0.0.0` in settings
+- Check that `WEBUI_HOST` is set to `0.0.0.0`
 - Verify firewall rules allow connections on the configured port
 - Use the host machine's IP address, not `localhost`
 
 **Port already in use**
-- Change `webui_port` to a different value (e.g., `8081` or `9000`)
+- Change `WEBUI_PORT` to a different value (e.g., `8081` or `9000`)
 - Find what's using the port: `lsof -i :5800` (Linux/Mac) or `netstat -ano | findstr :5800` (Windows)
 
 ## Technical Note

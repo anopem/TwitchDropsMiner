@@ -7,6 +7,8 @@ fork keeps its diff against upstream minimal.
 
 from __future__ import annotations
 
+import os
+
 import settings as _settings
 import inventory as _inventory
 
@@ -50,3 +52,21 @@ setattr(
     "eligible",
     property(_eligible_get),
 )
+
+
+import twitch as _twitch
+
+if os.environ.get("WEBUI_TWITCH_LOGIN", "android-browser") == "android-browser":
+    from webui.browser_login import first_to_complete
+
+    _upstream_browser_login = _twitch._AuthState._browser_login
+
+    async def _android_browser_login(self) -> str:
+        return await self._twitch.gui.login.ask_browser_login(
+            lambda: _upstream_browser_login(self)
+        )
+
+    _twitch._AuthState._browser_login = _android_browser_login
+    _twitch.first_to_complete = first_to_complete
+else:
+    _twitch._AuthState._browser_login = _twitch._AuthState._oauth_login

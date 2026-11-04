@@ -50,11 +50,7 @@ jobs:
         uses: actions/checkout@v7
 
       - name: Setup uv and Python
-<<<<<<< HEAD
-        uses: astral-sh/setup-uv@v10.1.0
-=======
         uses: astral-sh/setup-uv@v10.3.1
->>>>>>> 213a9e437b58d6fe407bddcfa4b63c642396bd21
         with:
           python-version: ${{env.PYTHON_VERSION}}
           enable-cache: true

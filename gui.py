@@ -1416,8 +1416,8 @@ class InventoryOverview:
         scroll(delta, "units")
 
     async def add_campaign(self, campaign: DropsCampaign) -> None:
-        # GOTO, Uncomment below to disable inventory
-        #return
+        # GOTO, Uncomment/comment return below to disable inventory
+        return
         campaign_frame = ttk.Frame(self._main_frame, relief="ridge", borderwidth=1, padding=4)
         campaign_frame.grid(column=0, row=len(self._campaigns), sticky="nsew", pady=5, padx=5)
         campaign_frame.rowconfigure(4, weight=1)
@@ -2372,8 +2372,9 @@ class GUIManager:
         inv_frame = ttk.Frame(root_frame, padding=8)
         self.inv = InventoryOverview(self, inv_frame)
         
-        # GOTO, comment below to disable inventory
-        self.tabs.add_tab(inv_frame, name=_("gui", "tabs", "inventory"))
+        # GOTO, uncomment/comment below to disable inventory
+        #self.tabs.add_tab(inv_frame, name=_("gui", "tabs", "inventory"))
+
         # Settings tab
         settings_frame = ttk.Frame(root_frame, padding=8)
         self.settings = SettingsPanel(self, settings_frame)
